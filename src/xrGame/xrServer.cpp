@@ -216,6 +216,8 @@ void xrServer::Update	()
 	if (Level().IsDemoPlayStarted() || Level().IsDemoPlayFinished())
 		return;								//diabling server when demo is playing
 
+	ProcessMessagesQueue();
+
 	NET_Packet		Packet;
 
 	VERIFY						(verify_entities());
@@ -401,7 +403,7 @@ void xrServer::SendUpdatePacketsToAll()
 			bool need_to_update_10 = Device.dwTimeGlobal - CL->m_last_update_time_10 >= u32(1000 / 10); // 10 per sec
 			bool need_to_update_5 = Device.dwTimeGlobal - CL->m_last_update_time_5 >= u32(1000 / 5);    // 5 per sec
 			bool need_to_update_1 = Device.dwTimeGlobal - CL->m_last_update_time_1 >= u32(1000);        // 1 per sec
-			bool need_to_update_05 = Device.dwTimeGlobal - CL->m_last_update_time_1 >= u32(2000);       // 1 per 2 sec
+			bool need_to_update_05 = Device.dwTimeGlobal - CL->m_last_update_time_05 >= u32(2000);       // 1 per 2 sec
 			
 			constexpr float distance_30 = 30.f * 30.f;
 			constexpr float distance_50 = 50.f * 50.f;
@@ -1326,6 +1328,11 @@ void xrServer::GetServerInfo( CServerInfo* si )
 		time = InventoryUtilities::GetGameTimeAsString( InventoryUtilities::etpTimeToMinutes ).c_str();
 		
 		xr_strcpy( tmp256, time );
+		// FPS
+		xr_strcat(tmp256, "   FPS = ");
+		xr_strcat(tmp256, itoa((int)(1.f / Device.fTimeDelta), tmp, 10));
+		xr_strcat(tmp256, "  ");
+
 		if ( g_sv_mp_iDumpStatsPeriod > 0 )
 		{
 			xr_strcat( tmp256, " statistic [" );
@@ -1460,15 +1467,15 @@ void xrServer::OnScriptEvent(NET_Packet & P, ClientID sender)
 	CopyMemory(&(pEvent->Packet), &P, sizeof(NET_Packet));
 }
 
-ScriptEvent * xrServer::GetLastServerScriptEvent()
+ScriptEvent * xrServer::GetFrontServerScriptEvent()
 {
 	R_ASSERT2(script_server_events.size() > 0, "empty script server events");
-	return &(script_server_events.back());
+	return &(script_server_events.front());
 }
 
-void xrServer::PopLastServerScriptEvent()
+void xrServer::PopFrontServerScriptEvent()
 {
-	script_server_events.pop_back();
+	script_server_events.pop_front();
 }
 
 u32 xrServer::GetSizeServerScriptEvent()

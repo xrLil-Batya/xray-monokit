@@ -471,8 +471,7 @@ void CMissile::Throw()
 	Msg("throw [%d]", Device.dwFrame);
 #endif // #ifndef MASTER_GOLD
 
-	CInventoryOwner* invOwner = smart_cast<CInventoryOwner*>(H_Parent());
-	CActor* pActor = smart_cast<CActor*>(invOwner);
+	CActor* pActor = smart_cast<CActor*>(H_Parent());
 
 	if (pActor && pActor == Level().CurrentControlEntity() || Local())
 	{

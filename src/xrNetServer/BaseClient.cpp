@@ -120,6 +120,7 @@ bool BaseClient::Connect(LPCSTR options)
 		bool success = CreateConnection(connectOpt);
 		if (!success)
 		{
+			DestroyConnection();
 			return false;
 		}
 

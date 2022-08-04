@@ -275,6 +275,7 @@ _keyboard* dik_to_ptr(int _dik, bool bSafe)
 int	keyname_to_dik (LPCSTR _name)
 {
 	_keyboard* _kb = keyname_to_ptr(_name);
+	if (!_kb) return -1;
 	return _kb->dik;
 }
 
@@ -562,7 +563,8 @@ public:
 		_GetItem				(args,cnt-1,key,' ');
 
 		int dik					= keyname_to_dik(key);
-		bindConsoleCmds.bind	(dik, console_command);
+		if (dik != -1)
+			bindConsoleCmds.bind(dik, console_command);
 	}
 
 	virtual void Save(IWriter* F) 
