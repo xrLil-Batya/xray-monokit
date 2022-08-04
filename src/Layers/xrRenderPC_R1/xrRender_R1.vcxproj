@@ -66,7 +66,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <OutDir>A:\Games\OMP Engine\bins\</OutDir>
+    <OutDir>$(SolutionDir)..\bins\</OutDir>
     <LibraryPath>$(OutDir)LIBS\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">

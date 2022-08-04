@@ -72,7 +72,7 @@
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
-    <OutDir>A:\Games\OMP Engine\bins\</OutDir>
+    <OutDir>$(SolutionDir)..\bins\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>

@@ -126,7 +126,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>A:\Games\OMP Engine\bins\</OutDir>
+    <OutDir>$(SolutionDir)..\bins\</OutDir>
     <IntDir>$(SolutionDir)\..\intermediate\$(Platform)-$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>C:\Users\dima\Documents\GitHub\neon\src\xrVoice\SDK\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir)LIBS\;$(LibraryPath)</LibraryPath>
@@ -136,6 +136,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bins\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -173,6 +174,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
       <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrVoice\SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -181,6 +183,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>true</EnableUAC>
       <AdditionalDependencies>vivoxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)LIBS;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
