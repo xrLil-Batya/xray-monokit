@@ -26,6 +26,7 @@
 #include "UITaskWnd.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
+#include "UIChatWnd.h"
 
 #define PDA_XML		"pda.xml"
 
@@ -91,6 +92,7 @@ void CUIPdaWnd::Init()
 	pUILogsWnd						= xr_new<CUILogsWnd>();
 	pUILogsWnd->Init				();
 
+	//pUIChatWnd						= CurrentGameUI()->m_pMessagesWnd->GetChatWnd();
 
 	UITabControl					= xr_new<CUITabControl>();
 	UITabControl->SetAutoDelete		(true);
@@ -190,6 +192,10 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 	{
 		m_pActiveDialog = pUILogsWnd;
 	}
+	else if ( section == "eptChat" )
+	{
+		m_pActiveDialog = pUIChatWnd;
+	}
 
 	R_ASSERT2						(m_pActiveDialog, "active dialog is not initialized");
 	UIMainPdaFrame->AttachChild		(m_pActiveDialog);
@@ -263,7 +269,7 @@ void CUIPdaWnd::DrawHint()
 	}
 	else if ( m_pActiveDialog == pUILogsWnd )
 	{
-
+		pUILogsWnd->UpdateNews();
 	}
 	m_hint_wnd->Draw();
 }
@@ -291,6 +297,7 @@ void CUIPdaWnd::Reset()
 //-	if ( pUIFactionWarWnd )	pUITaskWnd->ResetAll();
 	if ( pUIRankingWnd )	pUIRankingWnd->ResetAll();
 	if ( pUILogsWnd )		pUILogsWnd->ResetAll();
+	if ( pUIChatWnd )		pUILogsWnd->ResetAll();
 }
 
 void CUIPdaWnd::SetCaption( LPCSTR text )

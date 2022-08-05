@@ -19,7 +19,7 @@ class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
 class UIHint;
-
+class CUIChatWnd;
 
 class CUIPdaWnd: public CUIDialogWnd
 {
@@ -47,6 +47,7 @@ public:
 //-	CUIFactionWarWnd*		pUIFactionWarWnd;
 	CUIRankingWnd*			pUIRankingWnd;
 	CUILogsWnd*				pUILogsWnd;
+	CUIChatWnd*				pUIChatWnd;
 
 	virtual void			Reset				();
 
