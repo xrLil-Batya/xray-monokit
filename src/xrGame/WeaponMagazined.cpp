@@ -1113,11 +1113,51 @@ void CWeaponMagazined::PlayAnimHide()
 void CWeaponMagazined::PlayAnimReload()
 {
 	VERIFY(GetState()==eReload);
-	PlayHUDMotion("anm_reload", TRUE, this, GetState());
+	if (!iAmmoElapsed)
+		PlayHUDMotionIfExists({ "anm_reload_empty", "anm_reload" }, true, GetState());
+	else
+		PlayHUDMotion("anm_reload", TRUE, this, GetState());
+}
+
+const char* CWeaponMagazined::GetAnimAimName()
+{
+	auto pActor = smart_cast<const CActor*>(H_Parent());
+	if (pActor)
+	{
+		if (const u32 state = pActor->get_state() && state & mcAnyMove) 
+		{
+			if (IsScopeAttached()) 
+			{
+				strcpy_s(guns_aim_anm, "anm_idle_aim_scope_moving");
+				return guns_aim_anm;
+			}
+			else
+				return strcat(guns_aim_anm, std::string("anm_idle_aim_moving" + std::string((state & mcFwd) ? "_forward" : ((state & mcBack) ? "_back" : "")) + std::string((state & mcLStrafe) ? "_left" : ((state & mcRStrafe) ? "_right" : ""))).c_str());
+		}
+	}
+	return nullptr;
 }
 
 void CWeaponMagazined::PlayAnimAim()
 {
+	if (IsRotatingToZoom()) 
+	{
+		if (isHUDAnimationExist("anm_idle_aim_start"))
+		{
+			PlayHUDMotionNew("anm_idle_aim_start", true, GetState());
+			return;
+		}
+	}
+
+	if (const char* guns_aim_anm = GetAnimAimName()) 
+	{
+		if (isHUDAnimationExist(guns_aim_anm))
+		{
+			PlayHUDMotionNew(guns_aim_anm, true, GetState());
+			return;
+		}
+	}
+	
 	PlayHUDMotion("anm_idle_aim", TRUE, NULL, GetState());
 }
 
@@ -1127,14 +1167,28 @@ void CWeaponMagazined::PlayAnimIdle()
 	if(IsZoomed())
 	{
 		PlayAnimAim();
-	}else
+	}
+	else
+	{
+		if (IsRotatingFromZoom())
+		{
+			if (isHUDAnimationExist("anm_idle_aim_end"))
+			{
+				PlayHUDMotionNew("anm_idle_aim_end", true, GetState());
+				return;
+			}
+		}
 		inherited::PlayAnimIdle();
+	}
 }
 
 void CWeaponMagazined::PlayAnimShoot()
 {
 	VERIFY(GetState()==eFire);
-	PlayHUDMotion("anm_shots", FALSE, this, GetState());
+	string_path guns_shoot_anm{};
+	strcat(guns_shoot_anm, std::string("anm_shoot" + std::string((IsZoomed() && !IsRotatingToZoom()) ? (IsScopeAttached() ? "_aim_scope" : "_aim") : "") + (IsSilencerAttached() ? "_sil" : "")).c_str());
+	
+	PlayHUDMotionIfExists({ guns_shoot_anm, "anm_shoot", "anm_shots" }, false, GetState());
 }
 
 void CWeaponMagazined::OnZoomIn			()

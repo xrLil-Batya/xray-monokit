@@ -151,6 +151,11 @@ protected:
 protected:
 	virtual bool	AllowFireWhileWorking() {return false;}
 
+private:
+	string64 guns_aim_anm;
+protected:
+	const	char*	GetAnimAimName		();
+
 	//виртуальные функции для проигрывания анимации HUD
 	virtual void	PlayAnimShow		();
 	virtual void	PlayAnimHide		();

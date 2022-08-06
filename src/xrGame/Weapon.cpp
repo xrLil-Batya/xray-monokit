@@ -2197,3 +2197,8 @@ void CWeapon::LoadModParams(LPCSTR section)
 	m_nearwall_target_hud_fov = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_target_hud_fov", 0.27f);
 	m_nearwall_speed_mod = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_speed_mod", 10.f);
 }
+
+bool CWeapon::IsPartlyReloading() 
+{
+	return (m_set_next_ammoType_on_reload == u32(-1) && GetAmmoElapsed() > 0 && !IsMisfire());
+}

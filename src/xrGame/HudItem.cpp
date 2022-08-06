@@ -283,6 +283,24 @@ void CHudItem::on_a_hud_attach()
 
 u32 CHudItem::PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem*  W, u32 state)
 {
+	u32 anim_time = PlayHUDMotion_noCB(M, bMixIn);
+	if (anim_time > 0)
+	{
+		m_bStopAtEndAnimIsRunning = true;
+		m_dwMotionStartTm = Device.dwTimeGlobal;
+		m_dwMotionCurrTm = m_dwMotionStartTm;
+		m_dwMotionEndTm = m_dwMotionStartTm + anim_time;
+		m_startedMotionState = state;
+	}
+	else
+		m_bStopAtEndAnimIsRunning = false;
+
+	return anim_time;
+}
+
+u32 CHudItem::PlayHUDMotionNew(const shared_str& M, const bool bMixIn, const u32 state, const bool randomAnim)
+{
+	//Msg("~~[%s] Playing motion [%s] for [%s]", __FUNCTION__, M.c_str(), HudSection().c_str());
 	u32 anim_time					= PlayHUDMotion_noCB(M, bMixIn);
 	if (anim_time>0)
 	{
@@ -293,10 +311,48 @@ u32 CHudItem::PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem*  W, u32 
 		m_startedMotionState		= state;
 	}else
 		m_bStopAtEndAnimIsRunning	= false;
-
 	return anim_time;
 }
 
+u32 CHudItem::PlayHUDMotionIfExists(std::initializer_list<const char*> Ms, const bool bMixIn, const u32 state, const bool randomAnim)
+{
+	for (const auto* M : Ms)
+		if (isHUDAnimationExist(M))
+			return PlayHUDMotionNew(M, bMixIn, state, randomAnim);
+
+	std::string dbg_anim_name;
+	for (const auto* M : Ms) 
+	{
+		dbg_anim_name += M;
+		dbg_anim_name += ", ";
+	}
+	Msg("~~[%s] Motions [%s] not found for [%s]", __FUNCTION__, dbg_anim_name.c_str(), HudSection().c_str());
+
+	return 0;
+}
+
+//AVO: check if animation exists
+#include "ui_base.h"
+bool CHudItem::isHUDAnimationExist(LPCSTR anim_name)
+{
+	if (HudItemData()) // First person
+	{
+		string256 anim_name_r;
+		bool is_16x9 = UI().is_widescreen();
+		u16 attach_place_idx = pSettings->r_u16(HudItemData()->m_sect_name, "attach_place_idx");
+		xr_sprintf(anim_name_r, "%s%s", anim_name, (attach_place_idx == 1 && is_16x9) ? "_16x9" : "");
+		player_hud_motion* anm = HudItemData()->m_hand_motions.find_motion(anim_name_r);
+		if (anm)
+			return true;
+	}
+	else // Third person
+		if (g_player_hud->motion_length(anim_name, HudSection(), m_current_motion_def) > 100)
+			return true;
+#ifdef DEBUG
+	Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudSection().c_str());
+#endif
+	return false;
+}
 
 u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, BOOL bMixIn)
 {
@@ -354,17 +410,32 @@ bool CHudItem::TryPlayAnimIdle()
 		CActor* pActor = smart_cast<CActor*>(object().H_Parent());
 		if(pActor)
 		{
-			CEntity::SEntityState st;
-			pActor->g_State(st);
-			if(st.bSprint)
+			const u32 State = pActor->get_state();
+			if (State & mcSprint)
 			{
 				PlayAnimIdleSprint();
 				return true;
-			}else
-			if(!st.bCrouch && pActor->AnyMove())
+			}
+			else if (State & mcAnyMove)
 			{
-				PlayAnimIdleMoving();
-				return true;
+				if (!(State & mcCrouch))
+				{
+					if (State & mcAccel) //Õîäüáà ìåäëåííàÿ (SHIFT)
+						PlayAnimIdleMovingSlow();
+					else
+						PlayAnimIdleMoving();
+					return true;
+				}
+				else if (State & mcAccel) //Õîäüáà â ïðèñÿäå (CTRL+SHIFT)
+				{
+					PlayAnimIdleMovingCrouchSlow();
+					return true;
+				}
+				else
+				{
+					PlayAnimIdleMovingCrouch();
+					return true;
+				}
 			}
 		}
 	}
@@ -373,23 +444,35 @@ bool CHudItem::TryPlayAnimIdle()
 
 void CHudItem::PlayAnimIdleMoving()
 {
-	PlayHUDMotion("anm_idle_moving", TRUE, NULL, GetState());
+	PlayHUDMotionIfExists({ "anm_idle_moving", "anm_idle"}, true, GetState());
+}
+
+void CHudItem::PlayAnimIdleMovingSlow()
+{
+	PlayHUDMotionIfExists({ "anm_idle_moving_slow", "anm_idle_moving", "anm_idle"}, true, GetState());
+}
+
+void CHudItem::PlayAnimIdleMovingCrouch()
+{
+	PlayHUDMotionIfExists({ "anm_idle_moving_crouch", "anm_idle_moving", "anm_idle"}, true, GetState());
+}
+
+void CHudItem::PlayAnimIdleMovingCrouchSlow()
+{
+	PlayHUDMotionIfExists({ "anm_idle_moving_crouch_slow", "anm_idle_moving_crouch", "anm_idle_moving", "anm_idle"}, true, GetState());
 }
 
 void CHudItem::PlayAnimIdleSprint()
 {
-	PlayHUDMotion("anm_idle_sprint", TRUE, NULL,GetState());
+	PlayHUDMotionIfExists({ "anm_idle_sprint", "anm_idle"}, true, GetState());
 }
 
 void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 {
 	if(GetState()==eIdle && !m_bStopAtEndAnimIsRunning)
 	{
-		if( (cmd == ACTOR_DEFS::mcSprint) || (cmd == ACTOR_DEFS::mcAnyMove)  )
-		{
-			PlayAnimIdle						();
-			ResetSubStateTime					();
-		}
+		PlayAnimIdle();
+		ResetSubStateTime();
 	}
 }
 
