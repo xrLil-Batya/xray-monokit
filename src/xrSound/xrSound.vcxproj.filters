@@ -69,6 +69,17 @@
     <ClInclude Include="SoundRender_Cache.h">
       <Filter>Cache</Filter>
     </ClInclude>
+    <ClInclude Include="ISoundRecorder.h" />
+    <ClInclude Include="ISoundVoiceChat.h" />
+    <ClInclude Include="IStreamPlayer.h" />
+    <ClInclude Include="RingBuffer.h" />
+    <ClInclude Include="SoundRecorderA.h" />
+    <ClInclude Include="VoicePacket.h" />
+    <ClInclude Include="SoundVoiceChat.h" />
+    <ClInclude Include="SpeexPreprocess.h" />
+    <ClInclude Include="StreamPlayerA.h" />
+    <ClInclude Include="IVoicePacketSender.h" />
+    <ClInclude Include="VoicePacketsPacker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="guids.cpp">
@@ -128,5 +139,10 @@
     <ClCompile Include="SoundRender_Cache.cpp">
       <Filter>Cache</Filter>
     </ClCompile>
+    <ClCompile Include="SoundRecorderA.cpp" />
+    <ClCompile Include="SoundVoiceChat.cpp" />
+    <ClCompile Include="SpeexPreprocess.cpp" />
+    <ClCompile Include="StreamPlayerA.cpp" />
+    <ClCompile Include="VoicePacketsPacker.cpp" />
   </ItemGroup>
 </Project>
