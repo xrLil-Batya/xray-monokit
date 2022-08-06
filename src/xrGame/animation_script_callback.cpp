@@ -11,7 +11,7 @@ CBlend	*PlayMotionByParts(IKinematicsAnimated* sa, MotionID motion_ID, BOOL bMix
 	CBlend	*ret = 0;
 	CMotionDef * md = sa->LL_GetMotionDef( motion_ID );
 
-	if( md->bone_or_part != BI_NONE )
+	if( md && md->bone_or_part != BI_NONE )
 		return sa->LL_PlayCycle( md->bone_or_part, motion_ID, bMixIn, Callback, CallbackParam );
 
 	for (u16 i=0; i<MAX_PARTS; ++i) 

@@ -1028,6 +1028,12 @@ void CWeaponMagazined::InitAddons()
 			}
 			*/
 			LoadCurrentScopeParams(GetScopeName().c_str());
+
+			if (pSettings->line_exist(m_scopes[m_cur_scope], "bones"))
+			{
+				pcstr ScopeBone = pSettings->r_string(m_scopes[m_cur_scope], "bones");
+				m_cur_scope_bone = ScopeBone;
+			}
 		}
 	}
 	else
