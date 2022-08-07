@@ -3,7 +3,7 @@
 #include "Level.h"
 #include "Actor.h"
 #include "Inventory.h"
-#include "Weapon.h"
+#include "WeaponMagazinedWGrenade.h"
 #include "CustomDetector.h"
 
 #include <fstream>;
@@ -92,6 +92,12 @@ void game_sv_freemp::SavePlayer(game_PlayerState* ps, CInifile* file)
 				file->w_u8(itemID, "ammo_type", wpn->m_ammoType);
 				file->w_u8(itemID, "addon_State", wpn->GetAddonsState());
 				file->w_u8(itemID, "cur_scope", wpn->m_cur_scope);
+				if(auto wpn_w_gl = smart_cast<CWeaponMagazinedWGrenade*>(wpn))
+				{
+					file->w_bool(itemID, "grenade_mode", wpn_w_gl->m_bGrenadeMode);
+					file->w_u16(itemID, "ammo_count_g", wpn_w_gl->iAmmoElapsed2);
+					file->w_u8(itemID, "ammo_type_g", wpn_w_gl->m_ammoType2);
+				}
 			}
 
 			if (item->has_any_upgrades())
@@ -181,6 +187,13 @@ bool game_sv_freemp::LoadPlayer(game_PlayerState* ps, CInifile* file)
 					wpn->ammo_type = ammo_type;
 					wpn->m_addon_flags.flags = addon_state;
 					wpn->m_cur_scope = cur_scope;
+					
+					if(auto wpn_w_gl = smart_cast<CSE_ALifeItemWeaponMagazinedWGL*>(wpn))
+					{
+						wpn_w_gl->m_bGrenadeMode = READ_IF_EXISTS(file, r_bool, itemID, "grenade_mode", false);
+						wpn_w_gl->a_elapsed_grenades.grenades_count = READ_IF_EXISTS(file, r_u16, itemID, "ammo_count_g", 0);
+						wpn_w_gl->a_elapsed_grenades.grenades_type = READ_IF_EXISTS(file, r_u8, itemID, "ammo_type_g", 0);
+					}
 				}
 
 				if (ammo)
