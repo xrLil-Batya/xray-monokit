@@ -456,6 +456,7 @@ public:
 	bool					is_jump					();
 	u32						MovingState				() const {return mstate_real;}
 protected:
+	float					CurrentHeight;
 	u32						mstate_wishful;
 	u32						mstate_old;
 	u32						mstate_real;
