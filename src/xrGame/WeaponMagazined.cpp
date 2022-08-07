@@ -384,7 +384,8 @@ void CWeaponMagazined::OnStateSwitch	(u32 S)
 	switch (S)
 	{
 	case eIdle:
-		switch2_Idle	();
+		if(CanAssignIdleAnimNow())
+			switch2_Idle	();
 		break;
 	case eFire:
 		switch2_Fire	();
@@ -620,6 +621,12 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 		case eReload:	ReloadMagazine();	SwitchState(eIdle);	break;	// End of reload animation
 		case eHiding:	SwitchState(eHidden);   break;	// End of Hide
 		case eShowing:	SwitchState(eIdle);		break;	// End of Show
+
+		case eFire:
+		case eFire2:
+			SwitchState(eIdle);
+			break;
+
 		case eIdle:		switch2_Idle();			break;  // Keep showing idle
 	}
 	inherited::OnAnimationEnd(state);
@@ -1104,6 +1111,16 @@ void CWeaponMagazined::ResetSilencerKoeffs()
 	cur_silencer_koef.Reset();
 }
 
+bool CWeaponMagazined::CanAssignIdleAnimNow()
+{
+	const std::string anm_shoot = "anm_shoot";
+	const bool AllowIdleAnimWhileShooting = READ_IF_EXISTS(pSettings, r_bool, this->HudSection().c_str(), "cyclic_shoot_animations", false);
+
+	return (m_current_motion_def == nullptr) || 
+		(std::string(m_current_motion.c_str()).substr(0, anm_shoot.length()) != anm_shoot) ||
+		AllowIdleAnimWhileShooting;
+}
+
 void CWeaponMagazined::PlayAnimShow()
 {
 	VERIFY(GetState()==eShowing);
@@ -1130,7 +1147,8 @@ const char* CWeaponMagazined::GetAnimAimName()
 	auto pActor = smart_cast<const CActor*>(H_Parent());
 	if (pActor)
 	{
-		if (const u32 state = pActor->get_state() && state & mcAnyMove) 
+		const u32 state = pActor->get_state();
+		if (state & mcAnyMove)
 		{
 			if (IsScopeAttached()) 
 			{

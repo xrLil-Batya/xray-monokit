@@ -403,8 +403,13 @@ void CHudItem::PlayAnimIdle()
 	PlayHUDMotion("anm_idle", TRUE, NULL, GetState());
 }
 
+#include "WeaponMagazined.h"
 bool CHudItem::TryPlayAnimIdle()
 {
+	auto wpn = smart_cast<CWeaponMagazined*>(this);
+	if(wpn && !wpn->CanAssignIdleAnimNow())
+		return true;
+	
 	if(MovingAnimAllowedNow())
 	{
 		CActor* pActor = smart_cast<CActor*>(object().H_Parent());
