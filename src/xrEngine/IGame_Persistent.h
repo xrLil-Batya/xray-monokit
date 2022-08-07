@@ -118,6 +118,13 @@ public:
 #endif
 	virtual	void					LoadTitle			(bool change_tip=false, shared_str map_name=""){}
 	virtual bool					CanBePaused			()		{ return true;}
+
+	struct pda_data
+	{
+		float pda_display_factor;
+		float pda_psy_influence;
+		float pda_displaybrightness;
+	} pda_shader_data;
 };
 
 class IMainMenu

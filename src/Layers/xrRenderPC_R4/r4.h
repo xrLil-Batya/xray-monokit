@@ -341,6 +341,7 @@ public:
 	virtual void					rmNear						();
 	virtual void					rmFar						();
 	virtual void					rmNormal					();
+	void							PdaRenderToTarget();
 
 	// Constructor/destructor/loader
 	CRender							();

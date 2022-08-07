@@ -200,7 +200,6 @@ bool CUIGameCustom::ShowActorMenu()
 		m_ActorMenu->HideDialog();
 	}else
 	{
-		HidePdaMenu();
 		CInventoryOwner* pIOActor	= smart_cast<CInventoryOwner*>( Level().CurrentViewEntity() );
 		VERIFY						(pIOActor);
 		m_ActorMenu->SetActor		(pIOActor);

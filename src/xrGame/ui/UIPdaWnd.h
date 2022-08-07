@@ -20,6 +20,8 @@ class CUILogsWnd;
 class CUIAnimatedStatic;
 class UIHint;
 class CUIChatWnd;
+class CUIProgressBar;
+class CMapSpot;
 
 class CUIPdaWnd: public CUIDialogWnd
 {
@@ -42,6 +44,8 @@ protected:
 
 	UIHint*					m_hint_wnd;
 
+	bool bButtonL, bButtonR;
+	u32 dwPDAFrame;
 public:
 	CUITaskWnd*				pUITaskWnd;
 //-	CUIFactionWarWnd*		pUIFactionWarWnd;
@@ -59,10 +63,14 @@ public:
 
 	virtual void 			SendMessage			(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
+	Frect m_cursor_box;
+
 	virtual void 			Draw				();
 	virtual void 			Update				();
 	virtual void 			Show				(bool status);
-	virtual bool			OnMouseAction				(float x, float y, EUIMessages mouse_action) {CUIDialogWnd::OnMouseAction(x,y,mouse_action);return true;} //always true because StopAnyMove() == false
+	virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
+	void MouseMovement(float x, float y);
+	virtual void Enable(bool status);
 	virtual bool			OnKeyboardAction			(int dik, EUIMessages keyboard_action);
 		
 			UIHint*			get_hint_wnd		() const { return m_hint_wnd; }
@@ -79,4 +87,20 @@ public:
 			void			UpdatePda			();
 			void			UpdateRankingWnd	();
 
+	void ResetCursor();
+	Fvector2 last_cursor_pos;
+
+	Fvector target_joystickrot, joystickrot;
+	float target_buttonpress, buttonpress;
+
+	void ResetJoystick(bool bForce)
+	{
+		if (bForce)
+		{
+			joystickrot.set(0.f, 0.f, 0.f);
+			buttonpress = 0.f;
+		}
+		target_joystickrot.set(0.f, 0.f, 0.f);
+		target_buttonpress = 0.f;
+	}
 };

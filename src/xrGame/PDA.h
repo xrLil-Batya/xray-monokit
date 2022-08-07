@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../xrEngine/feel_touch.h"
-#include "inventory_item_object.h"
+#include "hud_item_object.h"
 
 #include "InfoPortionDefs.h"
 #include "character_info_defs.h"
@@ -14,10 +14,10 @@ class CPda;
 DEF_VECTOR (PDA_LIST, CPda*);
 
 class CPda :
-	public CInventoryItemObject,
+	public CHudItemObject,
 	public Feel::Touch
 {
-	typedef	CInventoryItemObject inherited;
+	typedef	CHudItemObject inherited;
 public:
 											CPda					();
 	virtual									~CPda					();
@@ -74,4 +74,40 @@ protected:
 
 	bool									m_bTurnedOff;
 	shared_str								m_functor_str;
+protected:
+
+	float m_fZoomfactor;
+	bool bButtonL;
+	bool bButtonR;
+	LPCSTR m_joystick_bone;
+	u16 joystick;
+	float m_screen_on_delay, m_screen_off_delay;
+	float target_screen_switch;
+	float m_fLR_CameraFactor;
+	float m_fLR_MovingFactor;
+	float m_fLR_InertiaFactor;
+	float m_fUD_InertiaFactor;
+	static void _BCL JoystickCallback(CBoneInstance* B);
+public:
+	virtual void OnStateSwitch(u32 S);
+	virtual void OnAnimationEnd(u32 state);
+	virtual void UpdateHudAdditonal(Fmatrix& trans);
+	virtual void OnMoveToRuck(const SInvItemPlace& prev);
+	virtual void UpdateCL();
+	virtual void UpdateXForm();
+	virtual void OnActiveItem();
+	virtual void OnHiddenItem();
+
+	enum eDeferredEnableState
+	{
+		eDefault,
+		eDisable,
+		eEnable,
+		eEnableZoomed
+	};
+
+	bool m_bZoomed;
+	eDeferredEnableState m_eDeferredEnable;
+	float m_psy_factor;
+	float m_thumb_rot[2];
 };
