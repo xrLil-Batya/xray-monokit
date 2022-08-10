@@ -51,7 +51,6 @@ public:
 //-	CUIFactionWarWnd*		pUIFactionWarWnd;
 	CUIRankingWnd*			pUIRankingWnd;
 	CUILogsWnd*				pUILogsWnd;
-	CUIChatWnd*				pUIChatWnd;
 
 	virtual void			Reset				();
 
