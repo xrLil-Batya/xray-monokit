@@ -247,6 +247,7 @@ void CUIPdaWnd::Update()
 	pUILogsWnd->PerformWork();
 }
 
+#include "string_table.h"
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 {
 	if ( m_pActiveDialog )
@@ -274,7 +275,14 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 	}
 	else if ( section == "eptChat" )
 	{
-		m_pActiveDialog = pUIChatWnd;
+		CUIChatWnd* pChatWnd		= CurrentGameUI()->m_pMessagesWnd->GetChatWnd();
+		R_ASSERT					(!pChatWnd->IsShown());
+		string512					prefix;
+		CStringTable st;
+		xr_sprintf(prefix, "%s> ", st.translate("st_mp_say_to_all").c_str());
+		pChatWnd->ChatToAll			(true);
+		pChatWnd->SetEditBoxPrefix	(prefix);
+		pChatWnd->ShowDialog		(false);
 	}
 
 	R_ASSERT2						(m_pActiveDialog, "active dialog is not initialized");
