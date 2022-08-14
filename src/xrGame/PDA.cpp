@@ -124,11 +124,12 @@ void CPda::OnStateSwitch(u32 S)
 		CUIPdaWnd* pda = CurrentGameUI() && &CurrentGameUI()->PdaMenu() ? &CurrentGameUI()->PdaMenu() : nullptr;
 		
 		g_player_hud->reset_thumb(true);
-		if(pda)
+		if(pda && pda->IsShown())
 		{
-			if (pda->IsShown())
+			/*if (pda->IsShown())
 				pda->Enable(true);
-			pda->ResetJoystick(true);
+			pda->ResetJoystick(true);*/
+			pda->HideDialog();
 		}
 		
 		SetPending(FALSE);

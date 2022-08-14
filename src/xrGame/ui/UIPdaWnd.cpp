@@ -246,6 +246,7 @@ void CUIPdaWnd::Update()
 }
 
 #include "string_table.h"
+#include "UIChatWnd.h"
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 {
 	if ( m_pActiveDialog )
@@ -274,17 +275,21 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 	else if ( section == "eptChat" )
 	{
 		CUIChatWnd* pChatWnd		= CurrentGameUI()->m_pMessagesWnd->GetChatWnd();
-		R_ASSERT					(!pChatWnd->IsShown());
 		string512					prefix;
 		CStringTable st;
 		xr_sprintf(prefix, "%s> ", st.translate("st_mp_say_to_all").c_str());
 		pChatWnd->ChatToAll			(true);
 		pChatWnd->SetEditBoxPrefix	(prefix);
-		pChatWnd->ShowDialog		(false);
+		if(!IsChild(pChatWnd))
+			AttachChild(pChatWnd);
+		
+		m_pActiveDialog = pChatWnd;
 	}
 
 	R_ASSERT2						(m_pActiveDialog, "active dialog is not initialized");
-	UIMainPdaFrame->AttachChild		(m_pActiveDialog);
+
+	if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
+		UIMainPdaFrame->AttachChild(m_pActiveDialog);
 	m_pActiveDialog->Show			(true);
 
 	if (m_pActiveDialog)
@@ -470,7 +475,7 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 					Console->Execute("main_menu");
 				}
 				else
-					Actor()->inventory().Activate(NO_ACTIVE_SLOT);
+					Actor()->inventory().Activate(NO_ACTIVE_SLOT, true);
 
 				return true;
 			}

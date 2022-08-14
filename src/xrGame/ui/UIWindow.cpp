@@ -569,7 +569,8 @@ CUIWindow*	CUIWindow::FindChild(const shared_str name)
 
 void CUIWindow::SetParent(CUIWindow* pNewParent) 
 {
-	R_ASSERT( !(m_pParentWnd && m_pParentWnd->IsChild(this)) );
+	if(m_pParentWnd && m_pParentWnd->IsChild(this))
+		m_pParentWnd->DetachChild(this);
 
 	m_pParentWnd = pNewParent;
 }

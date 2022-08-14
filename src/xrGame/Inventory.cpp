@@ -511,10 +511,7 @@ void CInventory::Activate_deffered	(u32 slot, u32 _frame)
 
 void CInventory::Activate(u16 slot, bool bForce) 
 {	
-	if(!OnServer())
-	{
-		return;
-	}
+	OnServer();
 
 	PIItem tmp_item = NULL;
 	if (slot != NO_ACTIVE_SLOT)

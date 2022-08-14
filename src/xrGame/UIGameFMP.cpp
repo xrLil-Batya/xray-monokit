@@ -155,11 +155,6 @@ bool CUIGameFMP::IR_UIOnKeyboardPress(int dik)
 
 	switch (get_binded_action(dik))
 	{
-		case kACTIVE_JOBS:
-			{
-				if (!pActor->inventory_disabled())
-					ShowPdaMenu();			
-			} break;
 		case kINVENTORY:
 			{
 				if (!pActor->inventory_disabled())
