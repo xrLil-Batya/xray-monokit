@@ -261,6 +261,7 @@ void game_sv_freemp::OnEvent(NET_Packet &P, u16 type, u32 time, ClientID sender)
 
 #include "Actor.h"
 
+static u32 frame = 0, frame2 = 0;
 void game_sv_freemp::Update()
 {
 	inherited::Update();
@@ -284,10 +285,8 @@ void game_sv_freemp::Update()
 
 				CObject* obj = Level().Objects.net_Find(player.second->GameID);
 				CActor* actor = smart_cast<CActor*>(obj);
-				if (!actor)
-					return;
-				if (!actor->g_Alive())
-					return;
+				if (!actor || !actor->g_Alive())
+					continue;
 
 				string_path file_name;
 				string32 filename;
@@ -298,8 +297,9 @@ void game_sv_freemp::Update()
 #ifndef MP_SAVE_JSON
 				CInifile* file = xr_new<CInifile>(file_name, false, false);
 				
-				if (file)
+				if (Device.dwTimeGlobal - 10000 > frame && file)
 				{
+					frame = Device.dwTimeGlobal;
 					SavePlayer(player.second, file);
 					file->save_as(file_name);
 				}
@@ -343,8 +343,9 @@ void game_sv_freemp::Update()
 				else
 				{
 					CInifile* boxFile = xr_new<CInifile>(path_name, false, false);
-					if (boxFile) 
+					if (Device.dwTimeGlobal - 10000 > frame2 && boxFile)
 					{
+						frame2 = Device.dwTimeGlobal;
 						SaveInvBox(box, boxFile);
 						boxFile->save_as(path_name);
 					}											
@@ -366,8 +367,6 @@ void game_sv_freemp::Update()
 			}
 		}
 	}
-   
-
 }
 
 BOOL game_sv_freemp::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)
