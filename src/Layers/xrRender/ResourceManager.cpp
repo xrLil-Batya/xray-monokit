@@ -13,6 +13,7 @@
 #include "tss.h"
 #include "blenders\blender.h"
 #include "blenders\blender_recorder.h"
+#include <thread>
 
 //	Already defined in Texture.cpp
 void fix_texture_name(LPSTR fn);
@@ -334,12 +335,45 @@ void CResourceManager::Delete(const Shader* S)
 	Msg	("! ERROR: Failed to find complete shader");
 }
 
+std::vector<CTexture*> tex_to_load;
+void TextureLoading(u16 thread_num)
+{
+	u32 upperbound = thread_num * 100;
+	u32 lowerbound = upperbound - 100;
+
+	for (u32 i = lowerbound; i < upperbound; i++)
+	{
+		if (i < tex_to_load.size())
+			tex_to_load[i]->Load();
+		else
+			break;
+	}
+}
+
 void CResourceManager::DeferredUpload()
 {
 	if (!RDEVICE.b_is_Ready) return;
-	for (map_TextureIt t=m_textures.begin(); t!=m_textures.end(); t++)
+	tex_to_load.clear();
+
+	if (m_textures.size() <= 100)
 	{
-		t->second->Load();
+		for (map_TextureIt t = m_textures.begin(); t != m_textures.end(); t++)
+			t->second->Load();
+	}
+	else
+	{
+		u32 th_count = (m_textures.size() / 100) + 1;
+		std::thread* th_arr = new std::thread[th_count];
+		for (auto tex : m_textures)
+			tex_to_load.push_back(tex.second);
+
+		for (u32 i = 0; i < th_count; i++)
+			th_arr[i] = std::thread(TextureLoading, i + 1);
+
+		for (u32 i = 0; i < th_count; i++)
+			th_arr[i].join();
+
+		tex_to_load.clear();
 	}
 }
 /*
