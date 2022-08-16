@@ -1061,6 +1061,7 @@ void CActor::g_Physics			(Fvector& _accel, float jump, float dt)
 
 float g_fov = 90.0f;
 
+#include "../xrEngine/engine_mode.h"
 float CActor::currentFOV()
 {
 	if (!psHUD_Flags.is(HUD_WEAPON|HUD_WEAPON_RT|HUD_WEAPON_RT2))
@@ -1068,16 +1069,33 @@ float CActor::currentFOV()
 
 	CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());	
 
-	if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() && ( !pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture())))
+	if(EngineMode()->GetMode() == eEngineModes::eModeGunsDev)
 	{
-		float fov = (g_fov / 2) * PI / 180;
-		float result = 2 * atan(tan(fov) / pWeapon->GetZoomFactor()) * 180 / PI;
+		if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() && ( !pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture())))
+		{
+			float fov = (g_fov / 2) * PI / 180;
+			float result = 2 * atan(tan(fov) / pWeapon->GetZoomFactor()) * 180 / PI;
 
-		return result;
+			return result;
+		}
+		else
+		{
+			return g_fov;
+		}
 	}
 	else
 	{
-		return g_fov;
+		if (pWeapon &&	pWeapon->IsZoomed() && ( !pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture()) ) )
+		{
+			if (eacFirstEye == cam_active)
+				return pWeapon->GetZoomFactor() * (0.75f);
+			else 
+				return pWeapon->GetZoomFactor() * (1.0f);
+		}
+		else
+		{
+			return g_fov;
+		}
 	}
 }
 

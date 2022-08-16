@@ -30,11 +30,31 @@
 #include "xrSash.h"
 
 #include "securom_api.h"
+#include "engine_mode.h"
 
 extern "C"
 {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 	_declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
+}
+
+CEngineMode engine_mode;
+
+ENGINE_API CEngineMode* EngineMode()
+{
+	return &engine_mode;
+}
+
+void CEngineMode::LoadMode()
+{
+	std::string mode = pSettings->r_string("Engine_Settings", "engine_mode");
+
+	if(mode == "guns_dev")
+		engine_mode = eEngineModes::eModeGunsDev;
+	else if(mode == "vanilla")
+		engine_mode = eEngineModes::eModeVanilla;
+	else
+		R_ASSERT(!"Invalid engine mode!");
 }
 
 //---------------------------------------------------------------------
@@ -381,6 +401,7 @@ void Startup()
 	logoWindow					= NULL;
 
 	Discord.Init();
+	EngineMode()->LoadMode();
 
 	// Main cycle
 	CheckCopyProtection			( );

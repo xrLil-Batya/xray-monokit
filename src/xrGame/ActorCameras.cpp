@@ -286,7 +286,7 @@ static const float	ik_cam_shift_speed = 0.01f;
 ENGINE_API extern float psHUD_FOV; //--#SM+#--
 ENGINE_API extern float psHUD_FOV_def; //--#SM+#--
 
-
+#include "../xrEngine/engine_mode.h"
 void CActor::cam_Update(float dt, float fFOV)
 {
 	if(m_holder)		return;
@@ -296,8 +296,13 @@ void CActor::cam_Update(float dt, float fFOV)
 		CWeapon* pWeapon = smart_cast<CWeapon*>(this->inventory().ActiveItem());
 		if (eacFirstEye == cam_active && pWeapon)
 		{
-			currentFOV();
-			psHUD_FOV = (psHUD_FOV_def * pWeapon->GetHudFov() * 100) / currentFOV();
+			if(EngineMode()->GetMode() == eEngineModes::eModeGunsDev)
+			{
+				currentFOV();
+				psHUD_FOV = (psHUD_FOV_def * pWeapon->GetHudFov() * 100) / currentFOV();
+			}
+			else
+				psHUD_FOV = pWeapon->GetHudFov();
 		}
 		else
 			psHUD_FOV = psHUD_FOV_def;
