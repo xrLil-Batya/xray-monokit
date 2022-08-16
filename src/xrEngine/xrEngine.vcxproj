@@ -460,6 +460,7 @@
     <ClInclude Include="dedicated_server_only.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="device.h" />
+    <ClInclude Include="DiscordRPC.hpp" />
     <ClInclude Include="doug_lea_memory_allocator.h" />
     <ClInclude Include="editor_environment_ambients_ambient.hpp" />
     <ClInclude Include="editor_environment_ambients_effect_id.hpp" />
@@ -587,6 +588,7 @@
     <ClCompile Include="Device_Misc.cpp" />
     <ClCompile Include="Device_overdraw.cpp" />
     <ClCompile Include="Device_wndproc.cpp" />
+    <ClCompile Include="DiscordRPC.cpp" />
     <ClCompile Include="doug_lea_memory_allocator.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Dedicated|Win32'">
       </PrecompiledHeader>

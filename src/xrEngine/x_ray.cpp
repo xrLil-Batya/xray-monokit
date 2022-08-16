@@ -25,10 +25,17 @@
 #include "Text_Console.h"
 #include <process.h>
 #include <locale.h>
+#include "DiscordRPC.hpp"
 
 #include "xrSash.h"
 
 #include "securom_api.h"
+
+extern "C"
+{
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+	_declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
+}
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni		= NULL;
@@ -45,16 +52,6 @@ XRCORE_API	u32		build_id;
 #ifdef MASTER_GOLD
 //#	define NO_MULTI_INSTANCES
 #endif // #ifdef MASTER_GOLD
-
-// Always request high performance GPU
-extern "C"
-{
-	// https://docs.nvidia.com/gameworks/content/technologies/desktop/optimus.htm
-	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
-
-	// https://gpuopen.com/amdpowerxpressrequesthighperformance/
-	__declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
-}
 
 static LPSTR month_id[12] = {
 	"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
@@ -382,6 +379,8 @@ void Startup()
 	// Destroy LOGO
 	DestroyWindow				(logoWindow);
 	logoWindow					= NULL;
+
+	Discord.Init();
 
 	// Main cycle
 	CheckCopyProtection			( );

@@ -624,6 +624,7 @@
     <ClInclude Include="ShadersExternalData.h">
       <Filter>Game API\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="DiscordRPC.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -968,6 +969,7 @@
     <ClCompile Include="xrSASH.cpp">
       <Filter>OpenAutomate</Filter>
     </ClCompile>
+    <ClCompile Include="DiscordRPC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
