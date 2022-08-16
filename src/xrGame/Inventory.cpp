@@ -511,7 +511,8 @@ void CInventory::Activate_deffered	(u32 slot, u32 _frame)
 
 void CInventory::Activate(u16 slot, bool bForce) 
 {	
-	OnServer();
+	if(!OnServer())
+		return;
 
 	PIItem tmp_item = NULL;
 	if (slot != NO_ACTIVE_SLOT)
@@ -629,6 +630,7 @@ void CInventory::SendActionEvent(u16 cmd, u32 flags)
 	pActor->u_EventSend		(P, net_flags(TRUE, TRUE, FALSE, TRUE));
 };
 
+#include "pda.h"
 bool CInventory::Action(u16 cmd, u32 flags) 
 {
 	CActor *pActor = smart_cast<CActor*>(m_pOwner);
@@ -686,11 +688,21 @@ bool CInventory::Action(u16 cmd, u32 flags)
 		}
 	}
 
+	bool b_send_event = false;
+	if (cmd == kQUIT && pActor && ActiveItem() && ActiveItem() && ActiveItem()->cast_hud_item()) // "Hack" to make Esc key open main menu instead of simply hiding the PDA UI
+	{
+		const auto pda = smart_cast<CPda*>(ActiveItem()->cast_hud_item());
+		if(pda && pda->GetState() != CPda::eHiding && pda->GetState() != CPda::eHidden)
+		{
+			b_send_event = true;
+			Activate(NO_ACTIVE_SLOT);
+		}
+	}
 
 	if (	ActiveItem() && 
 			ActiveItem()->Action(cmd, flags)) 
 											return true;
-	bool b_send_event = false;
+
 	switch(cmd) 
 	{
 	case kWPN_1:

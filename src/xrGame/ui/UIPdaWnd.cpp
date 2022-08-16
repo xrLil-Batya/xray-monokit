@@ -462,7 +462,11 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
 	if (WINDOW_KEY_PRESSED == keyboard_action && IsShown())
 	{
-		CPda* pda = Actor()->GetPDA();
+		const auto pActor = smart_cast<CActor*>(Level().CurrentEntity());
+		if (!pActor)
+			return inherited::OnKeyboardAction(dik, keyboard_action);
+
+		CPda* pda = pActor->GetPDA();
 		if (pda)
 		{
 			EGameActions action = get_binded_action(dik);
@@ -475,7 +479,7 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 					Console->Execute("main_menu");
 				}
 				else
-					Actor()->inventory().Activate(NO_ACTIVE_SLOT, true);
+					pActor->inventory().Activate(NO_ACTIVE_SLOT);
 
 				return true;
 			}
@@ -498,7 +502,7 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 			{
 				if (!pda->m_bZoomed && !IsEnabled())
 				{
-					Actor()->StopSprint();
+					pActor->StopSprint();
 
 					// Input state change must be deferred because actor state can still be sprinting when activating which would instantly deactivate input again
 					pda->m_eDeferredEnable = CPda::eDeferredEnableState::eEnableZoomed;
