@@ -1156,7 +1156,7 @@ const char* CWeaponMagazined::GetAnimAimName()
 				return guns_aim_anm;
 			}
 			else
-				return strcat(guns_aim_anm, std::string("anm_idle_aim_moving" + std::string((state & mcFwd) ? "_forward" : ((state & mcBack) ? "_back" : "")) + std::string((state & mcLStrafe) ? "_left" : ((state & mcRStrafe) ? "_right" : ""))).c_str());
+				return strconcat(sizeof(guns_aim_anm), guns_aim_anm, "anm_idle_aim_moving", (state & mcFwd) ? "_forward" : ((state & mcBack) ? "_back" : ""), (state & mcLStrafe) ? "_left" : ((state & mcRStrafe) ? "_right" : ""));
 		}
 	}
 	return nullptr;
@@ -1210,7 +1210,7 @@ void CWeaponMagazined::PlayAnimShoot()
 {
 	VERIFY(GetState()==eFire);
 	string_path guns_shoot_anm{};
-	strcat(guns_shoot_anm, std::string("anm_shoot" + std::string((IsZoomed() && !IsRotatingToZoom()) ? (IsScopeAttached() ? "_aim_scope" : "_aim") : "") + (IsSilencerAttached() ? "_sil" : "")).c_str());
+	strconcat(sizeof(guns_shoot_anm), guns_shoot_anm, "anm_shoot", (IsZoomed() && !IsRotatingToZoom()) ? (IsScopeAttached() ? "_aim_scope" : "_aim") : "", IsSilencerAttached() ? "_sil" : "");
 	
 	PlayHUDMotionIfExists({ guns_shoot_anm, "anm_shoot", "anm_shots" }, false, GetState());
 }

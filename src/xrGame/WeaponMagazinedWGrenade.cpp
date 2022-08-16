@@ -627,7 +627,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 			if (IsRotatingToZoom())
 			{
 				string32 guns_aim_anm;
-				strcat(guns_aim_anm, std::string("anm_idle_aim_start" + m_bGrenadeMode ? "_g" : "_w_gl").c_str());
+				strconcat(sizeof(guns_aim_anm), guns_aim_anm, "anm_idle_aim_start", m_bGrenadeMode ? "_g" : "_w_gl");
 				if (isHUDAnimationExist(guns_aim_anm)) 
 				{
 					PlayHUDMotionNew(guns_aim_anm, true, GetState());
@@ -638,7 +638,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 			if (const char* guns_aim_anm = GetAnimAimName())
 			{
 				string64 guns_aim_anm_full;
-				strcat(guns_aim_anm_full, (std::string(guns_aim_anm) + (m_bGrenadeMode ? "_g" : "_w_gl")).c_str());
+				strconcat(sizeof(guns_aim_anm_full), guns_aim_anm_full, guns_aim_anm, m_bGrenadeMode ? "_g" : "_w_gl");
 				if (isHUDAnimationExist(guns_aim_anm_full)) 
 				{
 					PlayHUDMotionNew(guns_aim_anm_full, true, GetState());
@@ -656,7 +656,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 			if (IsRotatingFromZoom())
 			{
 				string32 guns_aim_anm;
-				strcat(guns_aim_anm, std::string("anm_idle_aim_end" + m_bGrenadeMode ? "_g" : "_w_gl").c_str());
+				strconcat(sizeof(guns_aim_anm), guns_aim_anm, "anm_idle_aim_end", m_bGrenadeMode ? "_g" : "_w_gl");
 				if (isHUDAnimationExist(guns_aim_anm)) {
 					PlayHUDMotionNew(guns_aim_anm, true, GetState());
 					return;
@@ -748,7 +748,7 @@ void CWeaponMagazinedWGrenade::PlayAnimShoot()
 	if(m_bGrenadeMode)
 	{
 		string_path guns_shoot_anm{};
-		strcat(guns_shoot_anm, std::string("anm_shoot" + (this->IsZoomed() && !this->IsRotatingToZoom()) ? "_aim" : "", "_g").c_str());
+		strconcat(sizeof(guns_shoot_anm), guns_shoot_anm, "anm_shoot", (this->IsZoomed() && !this->IsRotatingToZoom()) ? "_aim" : "", "_g");
 
 		PlayHUDMotionIfExists({ guns_shoot_anm, "anm_shots_g" }, false, GetState());
 	}
@@ -758,9 +758,8 @@ void CWeaponMagazinedWGrenade::PlayAnimShoot()
 		if(IsGrenadeLauncherAttached())
 		{
 			string_path guns_shoot_anm{};
-			strcat(guns_shoot_anm, std::string("anm_shoot" + std::string(this->IsZoomed() && !this->IsRotatingToZoom() ? (this->IsScopeAttached() ? "_aim_scope" : "_aim") : "") + (this->IsSilencerAttached() ? "_sil" : "") + "_w_gl").c_str());
+			strconcat(sizeof(guns_shoot_anm), guns_shoot_anm, "anm_shoot", (this->IsZoomed() && !this->IsRotatingToZoom()) ? (this->IsScopeAttached() ? "_aim_scope" : "_aim") : "", this->IsSilencerAttached() ? "_sil" : "", "_w_gl");
 
-			
 			PlayHUDMotionIfExists({ guns_shoot_anm, "anm_shots_w_gl" }, false, GetState());
 		}
 		else
