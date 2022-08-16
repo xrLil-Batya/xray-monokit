@@ -42,6 +42,7 @@ protected:
 			// token
 			LPCSTR			GetOptTokenValue	();
 			xr_token*		GetOptToken			();
+			bool			IsLanguangeItem() { return (0 == xr_strcmp(m_entry.c_str(), "language")); }
 
 	shared_str				m_entry;
 	ESystemDepends			m_dep;

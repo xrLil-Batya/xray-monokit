@@ -123,32 +123,61 @@ void CUIComboBox::SetCurrentOptValue()
 	CUIOptionsItem::SetCurrentOptValue();
 
 	m_list_box.Clear		();
-	xr_token* tok			= GetOptToken();
 
-	while (tok->name)
-	{		
-		if(m_disabled.end()==std::find(m_disabled.begin(),m_disabled.end(),tok->id))
+	if (IsLanguangeItem())
+	{
+		u32 LanguagesCount = pSettings->line_count("languages");
+		for (u32 i = 0; i < LanguagesCount; i++)
 		{
-			AddItem_(tok->name, tok->id);
+			LPCSTR name, value;
+			pSettings->r_line("languages", i, &name, &value);
+			AddItem_(name, i);
 		}
-		tok++;
+	}
+	else
+	{
+		auto tok = GetOptToken();
+		while (tok->name)
+		{		
+			if(m_disabled.end()==std::find(m_disabled.begin(),m_disabled.end(),tok->id))
+			{
+				AddItem_(tok->name, tok->id);
+			}
+			tok++;
+		}
 	}
 
-	LPCSTR cur_val		= *CStringTable().translate( GetOptTokenValue());
-	m_text.SetText		( cur_val );
-	m_list_box.SetSelectedText( cur_val );
-	
-	CUIListBoxItem* itm	= m_list_box.GetSelectedItem();
-	if(itm)
-		m_itoken_id			= (int)(__int64)itm->GetData();
+	LPCSTR cur_val;
+	if (IsLanguangeItem())
+		cur_val = *CStringTable().ReturnLanguage();
 	else
-		m_itoken_id			= 1; //first
+		cur_val = *CStringTable().translate(GetOptTokenValue());
+
+	m_text.SetText(cur_val);
+	m_list_box.SetSelectedText(cur_val);
+
+	const auto itm = m_list_box.GetSelectedItem();
+	if (itm)
+		m_itoken_id = m_list_box.GetSelectedIDX(); // (int)(__int64)itm->GetData();
+	else
+		m_itoken_id = 0; //1; //first
 }
 
 void CUIComboBox::SaveBackUpOptValue()
 {
-	CUIOptionsItem::SaveBackUpOptValue	();
-	m_opt_backup_value = m_itoken_id;
+	CUIOptionsItem::SaveBackUpOptValue();
+	if (IsLanguangeItem())
+	{
+		LPCSTR					name, value;
+		pSettings->r_line("languages", m_itoken_id, &name, &value);
+		SaveOptStringValue(name);
+	}
+	else
+	{
+		const xr_token* tok = GetOptToken();
+		const char*	cur_val = tok[m_itoken_id].name;
+		SaveOptStringValue(cur_val);
+	}
 }
 
 void CUIComboBox::UndoOptValue()
