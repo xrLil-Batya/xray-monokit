@@ -49,7 +49,7 @@ CUIPdaWnd::CUIPdaWnd()
 	pUILogsWnd       = NULL;
 	m_hint_wnd       = NULL;
 	last_cursor_pos.set(UI_BASE_WIDTH / 2.f, UI_BASE_HEIGHT / 2.f);
-	m_cursor_box.set(117.f, 39.f, UI_BASE_WIDTH - 121.f, UI_BASE_HEIGHT - 37.f);
+	m_cursor_box.set(0.f, 0.f, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 	Init();
 }
 
@@ -143,6 +143,74 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 	};
 }
 
+enum TCursorDirection
+{
+	Idle, Up, Down, Left, Right, UpLeft, DownLeft, DownRight, UpRight
+};
+
+float GetAngleByLegs(const float x, const float y)
+{
+	const float gyp = sqrt(x * x + y * y);
+	float k = y / gyp;
+	clamp(k, -1.f, 1.f);
+
+	constexpr float pi = 3.1415926535;
+
+	float result = std::asin(k);
+	if (x < 0)
+		result = pi - result;
+	if (result < 0)
+		result += 2 * pi;
+
+	return result;
+};
+
+TCursorDirection GetPDADirByAngle(const float x, const float y)
+{
+	TCursorDirection result = Idle;
+	const float angle = GetAngleByLegs(x, y);
+
+	if ((angle>=0.393) && (angle<1.18))
+		result = DownRight;
+	else if ((angle>=1.18) && (angle<1.96))
+		result = Down;
+	else if ((angle>=1.96) && (angle<2.74))
+		result = DownLeft;
+	else if ((angle>=2.74) && (angle<3.53))
+		result = Left;
+	else if ((angle>=3.53) && (angle<4.32))
+		result = UpLeft;
+	else if ((angle>=4.32) && (angle<5.10))
+		result = Up;
+	else if ((angle>=5.10) && (angle<5.89))
+		result = UpRight;
+	else
+		result = Right;
+
+	return result;
+};
+
+const char* GetPDAJoystickAnimationModifier(const float x, const float y)
+{
+	const char* result = nullptr;
+
+	switch(GetPDADirByAngle(x, y))
+	{
+		case Up: result = "_up"; break;
+		case UpRight: result = "_up_right"; break;
+		case Right: result = "_right"; break;
+		case DownRight: result = "_down_right"; break;
+		case Down: result = "_down"; break;
+		case DownLeft: result = "_down_left"; break;
+		case Left: result = "_left"; break;
+		case UpLeft: result = "_up_left"; break;
+		default: result = ""; break;
+	}
+
+	return result;
+};
+
+static u32 TIME{};
 bool CUIPdaWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
 	switch (mouse_action)
@@ -159,7 +227,17 @@ bool CUIPdaWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 				return true;
 
 			if (mouse_action == WINDOW_LBUTTON_DOWN)
+			{
 				bButtonL = true;
+				
+				CPda* pda = Actor()->GetPDA();
+				if (pda && !pda->IsPending() && std::string(pda->anm_prefix) == "")
+				{
+					TIME = Device.dwTimeGlobal + 360;
+					pda->anm_prefix = "_click";
+					pda->PlayAnimIdle();
+				}
+			}
 			else if (mouse_action == WINDOW_RBUTTON_DOWN)
 				bButtonR = true;
 			else if (mouse_action == WINDOW_LBUTTON_UP)
@@ -174,33 +252,27 @@ bool CUIPdaWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 	return true; //always true because StopAnyMove() == false
 }
 
+static const char* prev_prefix{};
 void CUIPdaWnd::MouseMovement(float x, float y)
 {
+	if(TIME > Device.dwTimeGlobal)
+		return;
+
 	CPda* pda = Actor()->GetPDA();
-	if (!pda) return;
+	if (!pda || pda->IsPending()) return;
 
-	x *= .1f;
-	y *= .1f;
-	clamp(x, -.15f, .15f);
-	clamp(y, -.15f, .15f);
+	if(_abs(x) < 5 && _abs(y) < 5)
+		pda->anm_prefix = "";
+	else
+		pda->anm_prefix = GetPDAJoystickAnimationModifier(x, y);
 
-	if (_abs(x) < .05f)
-		x = 0.f;
+	if(prev_prefix && prev_prefix == pda->anm_prefix)
+		return;
+	
+	prev_prefix = pda->anm_prefix;
+	pda->PlayAnimIdle();
 
-	if (_abs(y) < .05f)
-		y = 0.f;
-
-	bool buttonpressed = (bButtonL || bButtonR);
-
-	target_buttonpress = (buttonpressed ? -.0015f : 0.f);
-	target_joystickrot.set(x*-.75f, 0.f, y*.75f);
-
-	x += y * pda->m_thumb_rot[0];
-	y += x * pda->m_thumb_rot[1];
-
-	g_player_hud->target_thumb0rot.set(y*.15f, y*-.05f, (x*-.15f) + (buttonpressed ? .002f : 0.f));
-	g_player_hud->target_thumb01rot.set(0.f, 0.f, (x*-.25f) + (buttonpressed ? .01f : 0.f));
-	g_player_hud->target_thumb02rot.set(0.f, 0.f, (x*.75f) + (buttonpressed ? .025f : 0.f));
+	TIME = Device.dwTimeGlobal + 130;
 }
 
 void CUIPdaWnd::Show(bool status)

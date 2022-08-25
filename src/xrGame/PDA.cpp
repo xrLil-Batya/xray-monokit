@@ -145,7 +145,7 @@ void CPda::OnStateSwitch(u32 S)
 		if (joystick != BI_NONE && HudItemData())
 		{
 			CBoneInstance* bi = &HudItemData()->m_model->LL_GetBoneInstance(joystick);
-			if (bi)
+			if (false && bi)
 				bi->set_callback(bctCustom, JoystickCallback, this);
 		}
 	}
@@ -172,6 +172,16 @@ void CPda::OnAnimationEnd(u32 state)
 	}
 	break;
 	}
+}
+
+void CPda::PlayAnimIdle()
+{
+	auto pActor = smart_cast<CActor*>(H_Parent());
+
+	string_path guns_pda_anim;
+	strconcat(520, guns_pda_anim, "anm_idle", anm_prefix, (pActor && (pActor->get_state() & mcAnyMove)) ? "_moving" : "");
+
+	PlayHUDMotionIfExists({ guns_pda_anim, "anm_idle" }, true, GetState());
 }
 
 // inertion

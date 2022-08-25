@@ -98,6 +98,9 @@ public:
 	virtual void OnActiveItem();
 	virtual void OnHiddenItem();
 
+	virtual void PlayAnimIdle() override;
+	const char* anm_prefix = "";
+
 	enum eDeferredEnableState
 	{
 		eDefault,
