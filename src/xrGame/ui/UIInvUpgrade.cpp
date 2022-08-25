@@ -137,7 +137,8 @@ void UIUpgrade::Update()
 		update_mask();
 	}
 
-	m_point->Show(get_upgrade()->get_highlight());
+	if(m_point && get_upgrade())
+		m_point->Show(get_upgrade()->get_highlight());
 }
 
 void UIUpgrade::update_upgrade_state()
@@ -295,8 +296,8 @@ void UIUpgrade::update_item( CInventoryItem* inv_item )
 	{
 		return;
 	}
-	VERIFY( get_upgrade() );
-	VERIFY( inv_item->m_section_id.size() );
+	if(!get_upgrade() || !inv_item->m_section_id.size())
+		return;
 
 	inventory::upgrade::UpgradeStateResult res = get_upgrade()->can_install( *inv_item, false );
 	

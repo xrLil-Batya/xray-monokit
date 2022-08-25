@@ -152,14 +152,12 @@ Upgrade* Root::get_upgrade_by_index( Ivector2 const& index )
 
 void Root::highlight_hierarchy( shared_str const& upgrade_id )
 {
-	Upgrades_vec::iterator ib = m_contained_upgrades.begin();
-	Upgrades_vec::iterator ie = m_contained_upgrades.end();
-	for ( ; ib != ie ; ++ib )
+	for (auto ib : m_contained_upgrades)
 	{
-		if ( (*ib)->id()._get() == upgrade_id._get() )
+		if (ib && ib->id()._get() == upgrade_id._get() )
 		{
-//			(*ib)->highlight_up();
-			(*ib)->highlight_down();
+//			ib->highlight_up();
+			ib->highlight_down();
 			return;
 		}
 	}

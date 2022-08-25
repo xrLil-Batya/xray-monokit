@@ -1394,12 +1394,36 @@ void CWeapon::UpdateAddonsVisibility()
 {
 	IKinematics* pWeaponVisual = smart_cast<IKinematics*>(Visual()); R_ASSERT(pWeaponVisual);
 
-	u16  bone_id;
 	UpdateHUDAddonsVisibility								();	
 
 	pWeaponVisual->CalculateBones_Invalidate				();
 
-	bone_id = pWeaponVisual->LL_BoneID					(wpn_scope_def_bone);
+	u16 bone_id = pWeaponVisual->LL_BoneID(wpn_scope_def_bone);
+
+	auto SetBoneVisible = [&](const shared_str& boneName, BOOL visibility)
+	{
+		u16 bone_id = pWeaponVisual->LL_BoneID(boneName);
+		if (bone_id != BI_NONE && visibility != pWeaponVisual->LL_GetBoneVisible(bone_id))
+			pWeaponVisual->LL_SetBoneVisible(bone_id, visibility, TRUE);
+	};
+
+	// Hide default bones
+	for (const shared_str& bone : m_defHiddenBones)
+	{
+		SetBoneVisible(bone, FALSE);
+	}
+
+	// Show default bones
+	for (const shared_str& bone : m_defShownBones)
+	{
+		SetBoneVisible(bone, TRUE);
+	}
+
+	for (int i = 0; i < m_all_scope_bones.size(); i++)
+		SetBoneVisible(m_all_scope_bones[i], FALSE);
+
+	if (m_cur_scope_bone != NULL)
+		SetBoneVisible(m_cur_scope_bone, TRUE);
 	
 	if(ScopeAttachable() && bone_id != BI_NONE)
 	{
@@ -2262,5 +2286,5 @@ void CWeapon::LoadModParams(LPCSTR section)
 
 bool CWeapon::IsPartlyReloading() 
 {
-	return (m_set_next_ammoType_on_reload == u32(-1) && GetAmmoElapsed() > 0 && !IsMisfire());
+	return iAmmoElapsed > 0;
 }

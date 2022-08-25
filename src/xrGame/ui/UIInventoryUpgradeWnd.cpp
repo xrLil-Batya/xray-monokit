@@ -153,7 +153,7 @@ void CUIInventoryUpgradeWnd::InitInventory( CInventoryItem* item, bool can_upgra
 		m_btn_repair->Enable(true);
 	}
 
-	if ( /*ai().get_alife() &&*/ m_inv_item )
+	if (Actor() && m_inv_item)
 	{
 		if ( install_item( *m_inv_item, can_upgrade ) )
 		{
@@ -204,7 +204,8 @@ void CUIInventoryUpgradeWnd::UpdateAllUpgrades()
 	UI_Upgrades_type::iterator ie = m_current_scheme->cells.end();
 	for ( ; ib != ie; ++ib )
 	{
-		(*ib)->update_item( m_inv_item );
+		if((*ib) && m_inv_item)
+			(*ib)->update_item( m_inv_item );
 	}
 }
 
@@ -259,7 +260,10 @@ bool CUIInventoryUpgradeWnd::install_item( CInventoryItem& inv_item, bool can_up
 //		m_item->AttachChild( ui_item->m_point );
 		m_back->AttachChild( ui_item->m_point );
 		
-		LPCSTR upgrade_name = get_manager().get_upgrade_by_index( inv_item, ui_item->get_scheme_index() );
+		const char* upgrade_name = get_manager().get_upgrade_by_index( inv_item, ui_item->get_scheme_index() );
+		if(!upgrade_name)
+			continue;
+		
 		ui_item->init_upgrade( upgrade_name, inv_item );
 		
 		Upgrade_type* upgrade_p = get_manager().get_upgrade( upgrade_name );
@@ -322,9 +326,8 @@ bool CUIInventoryUpgradeWnd::DBClickOnUIUpgrade( Upgrade_type const* upgr )
 
 void CUIInventoryUpgradeWnd::AskUsing( LPCSTR text, LPCSTR upgrade_name )
 {
-	VERIFY( m_inv_item );
-	VERIFY( upgrade_name );
-	VERIFY( m_pParentWnd );
+	if(!upgrade_name || !m_inv_item || !m_pParentWnd)
+		return;
 
 	UpdateAllUpgrades();
 
@@ -339,7 +342,7 @@ void CUIInventoryUpgradeWnd::AskUsing( LPCSTR text, LPCSTR upgrade_name )
 
 void CUIInventoryUpgradeWnd::OnMesBoxYes()
 {
-	if ( get_manager().upgrade_install( *m_inv_item, m_cur_upgrade_id, false ) )
+	if ( m_inv_item && get_manager().upgrade_install( *m_inv_item, m_cur_upgrade_id, false ) )
 	{
 		VERIFY( m_pParentWnd );
 		CUIActorMenu* parent_wnd = smart_cast<CUIActorMenu*>( m_pParentWnd );
@@ -355,13 +358,17 @@ void CUIInventoryUpgradeWnd::OnMesBoxYes()
 void CUIInventoryUpgradeWnd::HighlightHierarchy( shared_str const& upgrade_id )
 {
 	UpdateAllUpgrades();
-	get_manager().highlight_hierarchy( *m_inv_item, upgrade_id );
+	
+	if(m_inv_item)
+		get_manager().highlight_hierarchy( *m_inv_item, upgrade_id );
 }
 
 void CUIInventoryUpgradeWnd::ResetHighlight()
 {
 	UpdateAllUpgrades();
-	get_manager().reset_highlight( *m_inv_item );
+
+	if(m_inv_item)
+		get_manager().reset_highlight( *m_inv_item );
 }
 
 void CUIInventoryUpgradeWnd::set_info_cur_upgrade( Upgrade_type* upgrade )

@@ -607,10 +607,10 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
 
 	if(IsGrenadeLauncherAttached())
 	{
-		if (IsPartlyReloading())
-		{
-			PlayHUDMotionIfExists({ "anm_reload_gl_empty", "anm_reload_empty_w_gl", "anm_reload_w_gl" }, true, GetState());
-		}
+		if(IsMisfire() && isHUDAnimationExist("anm_reload_jammed_w_gl"))
+			PlayHUDMotion("anm_reload_jammed_w_gl", TRUE, this, GetState());
+		else if (IsPartlyReloading())
+			PlayHUDMotionIfExists({ "anm_reload_w_gl" }, true, GetState());
 		else
 			PlayHUDMotionIfExists({ "anm_reload_empty_w_gl", "anm_reload_w_gl" }, true, GetState());
 	}

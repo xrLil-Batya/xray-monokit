@@ -69,23 +69,73 @@ void CWeaponPistol::PlayAnimIdleMoving()
 	}
 }
 
+void CWeaponPistol::PlayAnimIdleMovingSlow()
+{
+	if (!iAmmoElapsed)
+		PlayHUDMotionIfExists({ "anm_idle_moving_slow_empty", "anim_empty", "anm_idle_moving_empty" }, true, GetState());
+	else
+		inherited::PlayAnimIdleMovingSlow();
+}
+
+void CWeaponPistol::PlayAnimIdleMovingCrouch()
+{
+	if (!iAmmoElapsed)
+		PlayHUDMotionIfExists({ "anm_idle_moving_crouch_empty", "anim_empty", "anm_idle_moving_empty" }, true, GetState());
+	else
+		inherited::PlayAnimIdleMovingCrouch();
+}
+
+void CWeaponPistol::PlayAnimIdleMovingCrouchSlow()
+{
+	if (!iAmmoElapsed)
+		PlayHUDMotionIfExists({ "anm_idle_moving_crouch_slow_empty", "anm_idle_moving_crouch_empty", "anim_empty", "anm_idle_moving_empty" }, true, GetState());
+	else
+		inherited::PlayAnimIdleMovingCrouchSlow();
+}
 
 void CWeaponPistol::PlayAnimIdle()
 {
 	if (TryPlayAnimIdle()) return;
 
-	if(iAmmoElapsed==0)
+	if (IsZoomed())
+		PlayAnimAim();
+	else if (!iAmmoElapsed)
 	{
-		PlayHUDMotion("anm_idle_empty", TRUE, NULL, GetState());
-	}else{
-		inherited::PlayAnimIdle		();
+		if (IsRotatingFromZoom()) {
+			if (isHUDAnimationExist("anm_idle_aim_end_empty")) {
+				PlayHUDMotionNew("anm_idle_aim_end_empty", true, GetState());
+				return;
+			}
+		}
+
+		PlayHUDMotionIfExists({ "anim_empty", "anm_idle_empty" }, true, GetState());
 	}
+	else
+		inherited::PlayAnimIdle		();
 }
 
 void CWeaponPistol::PlayAnimAim()
 {
-	if(iAmmoElapsed==0)
-		PlayHUDMotion("anm_idle_aim_empty", TRUE, NULL, GetState());
+	if (!iAmmoElapsed)
+	{
+		if (IsRotatingToZoom()) {
+			if (isHUDAnimationExist("anm_idle_aim_start_empty")) {
+				PlayHUDMotionNew("anm_idle_aim_start_empty", true, GetState());
+				return;
+			}
+		}
+
+		if (const char* guns_aim_anm = GetAnimAimName()) {
+			string64 guns_aim_anm_full;
+			strconcat(sizeof(string64), guns_aim_anm_full, guns_aim_anm, "_empty");
+			if (isHUDAnimationExist(guns_aim_anm_full)) {
+				PlayHUDMotionNew(guns_aim_anm_full, true, GetState());
+				return;
+			}
+		}
+
+		PlayHUDMotionIfExists({ "anim_empty", "anm_idle_aim_empty" }, true, GetState());
+	}
 	else
 		inherited::PlayAnimAim();
 }
@@ -93,12 +143,13 @@ void CWeaponPistol::PlayAnimAim()
 void CWeaponPistol::PlayAnimReload()
 {	
 	VERIFY(GetState()==eReload);
-	if(iAmmoElapsed==0)
-	{
+
+	if(IsMisfire() && isHUDAnimationExist("anm_reload_jammed"))
+		PlayHUDMotion("anm_reload_jammed", TRUE, this, GetState());
+	else if(!IsPartlyReloading())
 		PlayHUDMotion("anm_reload_empty", TRUE, this, GetState());
-	}else{
+	else
 		PlayHUDMotion("anm_reload", TRUE, this, GetState());
-	}
 }
 
 
@@ -117,6 +168,13 @@ void CWeaponPistol::PlayAnimHide()
 void CWeaponPistol::PlayAnimShoot	()
 {
 	VERIFY(GetState()==eFire);
+	string_path guns_shoot_anm{};
+	strconcat(sizeof(string_path), guns_shoot_anm, "anm_shoot", (this->IsZoomed() && !this->IsRotatingToZoom()) ? "_aim" : "", iAmmoElapsed == 1 ? "_last" : "", this->IsSilencerAttached() ? "_sil" : "");
+	if (isHUDAnimationExist(guns_shoot_anm)) {
+		PlayHUDMotionNew(guns_shoot_anm, false, GetState());
+		return;
+	}
+	
 	if(iAmmoElapsed > 1) 
 	{
 		PlayHUDMotion("anm_shots" , FALSE, this, GetState());

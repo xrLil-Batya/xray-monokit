@@ -77,6 +77,16 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	m_sounds.LoadSound(section,"snd_empty", "sndEmptyClick"	, false, m_eSoundEmptyClick	);
 	m_sounds.LoadSound(section,"snd_reload", "sndReload"		, true, m_eSoundReload		);
 	
+	if(pSettings->line_exist(section, "snd_reload_empty"))
+		m_sounds.LoadSound(section,"snd_reload_empty", "sndReloadEmpty", true, m_eSoundReload);
+	else
+		m_sounds.LoadSound(section,"snd_reload", "sndReloadEmpty", true, m_eSoundReload);
+	
+	if(pSettings->line_exist(section, "snd_reload_jammed"))
+		m_sounds.LoadSound(section,"snd_reload_jammed", "sndReloadJammed", true, m_eSoundReload);
+	else
+		m_sounds.LoadSound(section,"snd_reload", "sndReloadJammed", true, m_eSoundReload);
+
 	m_sSndShotCurrent = "sndShot";
 		
 	//звуки и партиклы глушителя, еслит такой есть
@@ -157,8 +167,8 @@ void CWeaponMagazined::FireEnd()
 {
 	inherited::FireEnd();
 
-	CActor	*actor = smart_cast<CActor*>(H_Parent());
-	if(m_pInventory && !iAmmoElapsed && actor && GetState()!=eReload) 
+	CActor	*actor = smart_cast<CActor*>(H_Parent()); // вырубил
+	if(false && m_pInventory && !iAmmoElapsed && actor && GetState()!=eReload) 
 		Reload();
 }
 
@@ -707,7 +717,14 @@ void CWeaponMagazined::switch2_Empty()
 void CWeaponMagazined::PlayReloadSound()
 {
 	if(m_sounds_enabled)
-		PlaySound	("sndReload",get_LastFP());
+	{
+		if(IsMisfire())
+			PlaySound	("sndReloadJammed",get_LastFP());
+		else if(!IsPartlyReloading())
+			PlaySound	("sndReloadEmpty",get_LastFP());
+		else
+			PlaySound	("sndReload",get_LastFP());
+	}
 }
 
 void CWeaponMagazined::switch2_Reload()
@@ -1136,7 +1153,9 @@ void CWeaponMagazined::PlayAnimHide()
 void CWeaponMagazined::PlayAnimReload()
 {
 	VERIFY(GetState()==eReload);
-	if (!iAmmoElapsed)
+	if(IsMisfire() && isHUDAnimationExist("anm_reload_jammed"))
+		PlayHUDMotion("anm_reload_jammed", TRUE, this, GetState());
+	else if (!IsPartlyReloading())
 		PlayHUDMotionIfExists({ "anm_reload_empty", "anm_reload" }, true, GetState());
 	else
 		PlayHUDMotion("anm_reload", TRUE, this, GetState());

@@ -464,6 +464,9 @@ void Manager::compute_range_section( LPCSTR section, LPCSTR parameter, float& lo
 
 void Manager::highlight_hierarchy( CInventoryItem& item, shared_str const& upgrade_id )
 {
+	if(!&item || !*upgrade_id)
+		return;
+
 	Root* root_p = get_root( item.m_section_id );
 	if ( root_p )
 	{
