@@ -3177,7 +3177,7 @@ void register_mp_console_commands()
 #endif
 
 	CMD1(CCC_RadminCmd,		"ra");
-	CMD1(CCC_Name,			"name");
+	//CMD1(CCC_Name,			"name");
 	CMD1(CCC_SvStatus,		"sv_status");
 	CMD1(CCC_SvChat,		"chat");
 
