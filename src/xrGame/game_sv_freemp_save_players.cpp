@@ -244,7 +244,7 @@ void game_sv_freemp::SaveInvBox(CSE_ALifeInventoryBox* box, CInifile* file)
 	for (auto id : box->children)
 	{
 		ids += 1;
-		string32 itemID;
+		string_path itemID;
 		xr_sprintf(itemID, "item_%d", ids);
 
 		CInventoryItem* item = smart_cast<CInventoryItem*>( Level().Objects.net_Find(id));

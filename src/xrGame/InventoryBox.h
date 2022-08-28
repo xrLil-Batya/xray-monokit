@@ -13,11 +13,13 @@ protected:
 	bool	m_in_use;
 	bool	m_can_take;
 	bool	m_closed;
+	bool bPersonal{};
 
 public:
 						CInventoryBox					();
 	virtual				~CInventoryBox					();
 
+	virtual void Load(LPCSTR section) override;
 	virtual		void	OnEvent							(NET_Packet& P, u16 type);
 	virtual		BOOL	net_Spawn						(CSE_Abstract* DC);
 	virtual		void	net_Destroy						();
@@ -34,6 +36,8 @@ public:
 
 				void	set_closed						(bool status, LPCSTR reason);
 	IC			bool	closed							() const { return m_closed; }
+
+	IC const bool IsPersonal() const {}
 
 protected:
 				void	SE_update_status				();

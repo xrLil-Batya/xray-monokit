@@ -21,6 +21,11 @@ CInventoryBox::~CInventoryBox()
 {
 }
 
+void CInventoryBox::Load(LPCSTR section)
+{
+	bPersonal = READ_IF_EXISTS(pSettings, r_bool, section, "personal", false);
+}
+
 void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 {
 	inherited::OnEvent	(P, type);

@@ -205,8 +205,8 @@ void game_sv_freemp::OnPlayerReady(ClientID id_who)
 			if (ps->IsSkip())
 				break;
 
-			if (!(ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)))
-				break;
+			//if (!(ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)))
+				//break;
 
 			RespawnPlayer(id_who, true);
 		} break;

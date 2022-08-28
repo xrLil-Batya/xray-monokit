@@ -146,12 +146,12 @@ bool game_cl_freemp::OnKeyboardPress(int key)
 		CObject* curr = Level().CurrentControlEntity();
 		if (!curr) return(false);
 
-		bool is_actor = !!smart_cast<CActor*>(curr);
+		CActor* is_actor = smart_cast<CActor*>(curr);
 		bool is_spectator = !!smart_cast<CSpectator*>(curr);
 
 		game_PlayerState* ps = local_player;
 				
-		if (is_spectator || (is_actor && ps && ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)))
+		if (is_spectator || (is_actor && !is_actor->g_Alive()))
 		{
 			b_need_to_send_ready = true;
 		}

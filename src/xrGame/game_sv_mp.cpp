@@ -284,17 +284,17 @@ void	game_sv_mp::KillPlayer				(ClientID id_who, u16 GameID)
 			Msg("! WARNING: Actor already died");
 			return;
 		}
-		pActor->set_death_time		();
+		//pActor->set_death_time		();
 	}
 	//-------------------------------------------------------
-	u16 PlayerID = (xrCData != 0) ? xrCData->ps->GameID : GameID;
+	//u16 PlayerID = (xrCData != 0) ? xrCData->ps->GameID : GameID;
 	//-------------------------------------------------------
-	SendPlayerKilledMessage(PlayerID, KT_HIT, PlayerID, 0, SKT_NONE);
+	//SendPlayerKilledMessage(PlayerID, KT_HIT, PlayerID, 0, SKT_NONE);
 	//-------------------------------------------------------
 	/*AllowDeadBodyRemove			(id_who, GameID);
 	m_CorpseList.push_back		(GameID);*/
 	// Kill Player on all clients
-	NET_Packet			P;
+	/*NET_Packet			P;
 	u_EventGen(P, GE_DIE, PlayerID);
 	P.w_u16				(PlayerID);
 	P.w_clientID		(id_who);
@@ -302,7 +302,7 @@ void	game_sv_mp::KillPlayer				(ClientID id_who, u16 GameID)
 	u_EventSend(P, net_flags(TRUE, TRUE, FALSE, TRUE));
 	
 	if (xrCData) SetPlayersDefItems		(xrCData->ps);
-	signal_Syncronize();
+	signal_Syncronize();*/
 	//-------------------------------------------------------	
 	
 };

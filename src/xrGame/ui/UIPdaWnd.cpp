@@ -210,7 +210,6 @@ const char* GetPDAJoystickAnimationModifier(const float x, const float y)
 	return result;
 };
 
-static u32 TIME{};
 bool CUIPdaWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
 	switch (mouse_action)
@@ -227,17 +226,7 @@ bool CUIPdaWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 				return true;
 
 			if (mouse_action == WINDOW_LBUTTON_DOWN)
-			{
 				bButtonL = true;
-				
-				CPda* pda = Actor()->GetPDA();
-				if (pda && !pda->IsPending() && std::string(pda->anm_prefix) == "")
-				{
-					TIME = Device.dwTimeGlobal + 360;
-					pda->anm_prefix = "_click";
-					pda->PlayAnimIdle();
-				}
-			}
 			else if (mouse_action == WINDOW_RBUTTON_DOWN)
 				bButtonR = true;
 			else if (mouse_action == WINDOW_LBUTTON_UP)
@@ -253,6 +242,7 @@ bool CUIPdaWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 }
 
 static const char* prev_prefix{};
+static u32 TIME{}, last_click_time{};
 void CUIPdaWnd::MouseMovement(float x, float y)
 {
 	if(TIME > Device.dwTimeGlobal)
@@ -261,8 +251,13 @@ void CUIPdaWnd::MouseMovement(float x, float y)
 	CPda* pda = Actor()->GetPDA();
 	if (!pda || pda->IsPending()) return;
 
-	if(_abs(x) < 5 && _abs(y) < 5)
-		pda->anm_prefix = "";
+	if(!_abs(x) && !_abs(y))
+	{
+		if(m_dwLastClickTime != last_click_time && std::string(pda->anm_prefix) == "" && (pda->GetCurrentMotion() == "anm_idle" || pda->GetCurrentMotion() == "anm_idle_moving"))
+			pda->anm_prefix = "_click";
+		else
+			pda->anm_prefix = "";
+	}
 	else
 		pda->anm_prefix = GetPDAJoystickAnimationModifier(x, y);
 
@@ -272,7 +267,8 @@ void CUIPdaWnd::MouseMovement(float x, float y)
 	prev_prefix = pda->anm_prefix;
 	pda->PlayAnimIdle();
 
-	TIME = Device.dwTimeGlobal + 130;
+	last_click_time = m_dwLastClickTime;
+	TIME = Device.dwTimeGlobal + 200;
 }
 
 void CUIPdaWnd::Show(bool status)

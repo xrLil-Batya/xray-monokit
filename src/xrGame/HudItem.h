@@ -179,5 +179,6 @@ public:
 	virtual void				debug_draw_firedeps		() {};
 
 	virtual CHudItem*			cast_hud_item			()				{ return this; }
+	IC std::string GetCurrentMotion() const { return *m_current_motion; }
 };
 

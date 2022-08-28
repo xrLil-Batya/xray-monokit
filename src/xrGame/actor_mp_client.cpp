@@ -37,8 +37,9 @@ void CActorMP::Die			(CObject *killer)
 {
 	//m_i_am_dead				= true;
 	//conditions().health()	= 0.f;
-	conditions().SetHealth( 0.f );
-	inherited::Die			(killer);
+	conditions().SetHealth( 0.02f );
+	StopAnyMove();
+	//inherited::Die			(killer);
 }
 
 void CActorMP::cam_Set		(EActorCameras style)
