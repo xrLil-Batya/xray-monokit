@@ -19,13 +19,14 @@ class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
 class UIHint;
-class CUIChatWnd;
+class CUIMessagesWindow;
 class CUIProgressBar;
 class CMapSpot;
 
 class CUIPdaWnd: public CUIDialogWnd
 {
 	typedef CUIDialogWnd	inherited;
+	friend class CUIMessagesWindow;
 protected:
 	CUITabControl*			UITabControl;
 	CUI3tButton*			m_btn_close;
@@ -38,6 +39,10 @@ protected:
 //	CUIAnimatedStatic*		m_anim_static;
 	CUITextWnd*				m_clock;
 
+public:
+	CUIMessagesWindow*			m_pMessagesWnd;
+
+protected:
 	// Текущий активный диалог
 	CUIWindow*				m_pActiveDialog;
 	shared_str				m_sActiveSection;

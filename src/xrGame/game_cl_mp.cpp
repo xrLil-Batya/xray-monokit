@@ -42,6 +42,7 @@
 #include "reward_manager.h"
 #include "login_manager.h"
 #include "stats_submitter.h"
+#include "ui/uipdawnd.h"
 
 #include "xrServer_info.h" //for enum_server_info_type
 
@@ -181,7 +182,7 @@ bool game_cl_mp::OnKeyboardPress(int key)
 		case kCHAT:
 		case kCHAT_TEAM:
 			{
-				CUIChatWnd* pChatWnd		= m_game_ui_custom->m_pMessagesWnd->GetChatWnd();
+				CUIChatWnd* pChatWnd		= m_game_ui_custom->PdaMenu().m_pMessagesWnd->GetChatWnd();
 				R_ASSERT					(!pChatWnd->IsShown());
 				string512					prefix;
 				xr_sprintf(prefix, "%s> ", st.translate((kCHAT_TEAM==key)?"st_mp_say_to_team":"st_mp_say_to_all").c_str());
@@ -489,7 +490,7 @@ void game_cl_mp::OnChatMessage(NET_Packet* P)
 	LPSTR colPlayerName;
 	STRCONCAT(colPlayerName, GetTeamColor(team), PlayerName, ":%c[default]");
 	if (Level().CurrentViewEntity() && CurrentGameUI())
-		CurrentGameUI()->m_pMessagesWnd->AddChatMessage(ChatMsg, colPlayerName);
+		CurrentGameUI()->PdaMenu().m_pMessagesWnd->AddChatMessage(ChatMsg, colPlayerName);
 };
 
 void game_cl_mp::shedule_Update(u32 dt)
@@ -532,7 +533,7 @@ void game_cl_mp::shedule_Update(u32 dt)
 		}break;
 	default:
 		{
-			CUIChatWnd* pChatWnd = CurrentGameUI()->m_pMessagesWnd->GetChatWnd();
+			CUIChatWnd* pChatWnd = CurrentGameUI()->PdaMenu().m_pMessagesWnd->GetChatWnd();
 			if (pChatWnd && pChatWnd->IsShown())
 				pChatWnd->HideDialog();
 		}break;
@@ -661,7 +662,7 @@ void game_cl_mp::OnSwitchPhase			(u32 old_phase, u32 new_phase)
 			if(CurrentGameUI())
 			{
 				 CurrentGameUI()->ShowGameIndicators(true);
-				 CurrentGameUI()->m_pMessagesWnd->PendingMode(false);
+				 CurrentGameUI()->PdaMenu().m_pMessagesWnd->PendingMode(false);
 			}
 		}break;
 	case GAME_PHASE_PENDING:
@@ -673,7 +674,7 @@ void game_cl_mp::OnSwitchPhase			(u32 old_phase, u32 new_phase)
 				if(CurrentGameUI())
 				{
 					 CurrentGameUI()->ShowGameIndicators(true);
-					 CurrentGameUI()->m_pMessagesWnd->PendingMode(true);
+					 CurrentGameUI()->PdaMenu().m_pMessagesWnd->PendingMode(true);
 				}
 			}
 		};
@@ -982,8 +983,8 @@ void game_cl_mp::OnPlayerKilled			(NET_Packet& P)
 	default:
 		break;
 	}
-	if (CurrentGameUI() && CurrentGameUI()->m_pMessagesWnd)
-		CurrentGameUI()->m_pMessagesWnd->AddLogMessage(KMS);
+	if (CurrentGameUI() && CurrentGameUI()->PdaMenu().m_pMessagesWnd)
+		CurrentGameUI()->PdaMenu().m_pMessagesWnd->AddLogMessage(KMS);
 };
 
 extern	void	WritePlayerName_ToRegistry	(LPSTR name);

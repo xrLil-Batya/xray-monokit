@@ -19,6 +19,7 @@
 #include "UIMainIngameWnd.h"
 #include "UITabButton.h"
 #include "UIAnimatedStatic.h"
+#include "uimessageswindow.h"
 
 #include "UIHelper.h"
 #include "UIHint.h"
@@ -47,6 +48,7 @@ CUIPdaWnd::CUIPdaWnd()
 //-	pUIFactionWarWnd = NULL;
 	pUIRankingWnd    = NULL;
 	pUILogsWnd       = NULL;
+	m_pMessagesWnd       = nullptr;
 	m_hint_wnd       = NULL;
 	last_cursor_pos.set(UI_BASE_WIDTH / 2.f, UI_BASE_HEIGHT / 2.f);
 	m_cursor_box.set(0.f, 0.f, UI_BASE_WIDTH, UI_BASE_HEIGHT);
@@ -60,6 +62,7 @@ CUIPdaWnd::~CUIPdaWnd()
 	delete_data( pUIRankingWnd );
 	delete_data( pUILogsWnd );
 	delete_data( m_hint_wnd );
+	delete_data(m_pMessagesWnd);
 	delete_data( UINoice );
 }
 
@@ -101,6 +104,7 @@ void CUIPdaWnd::Init()
 	pUILogsWnd						= xr_new<CUILogsWnd>();
 	pUILogsWnd->Init				();
 
+	m_pMessagesWnd						= xr_new<CUIMessagesWindow>();
 
 	UITabControl					= xr_new<CUITabControl>();
 	UITabControl->SetAutoDelete		(true);
@@ -342,16 +346,15 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 	}
 	else if ( section == "eptChat" )
 	{
-		CUIChatWnd* pChatWnd		= CurrentGameUI()->m_pMessagesWnd->GetChatWnd();
 		string512					prefix;
 		CStringTable st;
 		xr_sprintf(prefix, "%s> ", st.translate("st_mp_say_to_all").c_str());
+		
+		auto pChatWnd = m_pMessagesWnd->GetChatWnd();
 		pChatWnd->ChatToAll			(true);
 		pChatWnd->SetEditBoxPrefix	(prefix);
-		if(!IsChild(pChatWnd))
-			AttachChild(pChatWnd);
 		
-		m_pActiveDialog = pChatWnd;
+		m_pActiveDialog = m_pMessagesWnd;
 	}
 
 	R_ASSERT2						(m_pActiveDialog, "active dialog is not initialized");
@@ -479,6 +482,7 @@ void CUIPdaWnd::Reset()
 //-	if ( pUIFactionWarWnd )	pUITaskWnd->ResetAll();
 	if ( pUIRankingWnd )	pUIRankingWnd->ResetAll();
 	if ( pUILogsWnd )		pUILogsWnd->ResetAll();
+	if (m_pMessagesWnd)		m_pMessagesWnd->ResetAll();
 }
 
 void CUIPdaWnd::SetCaption( LPCSTR text )

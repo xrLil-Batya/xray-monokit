@@ -37,7 +37,7 @@ struct predicate_find_stat
 };
 
 CUIGameCustom::CUIGameCustom()
-:m_msgs_xml(NULL),m_ActorMenu(NULL),m_PdaMenu(NULL),m_window(NULL),UIMainIngameWnd(NULL),m_pMessagesWnd(NULL)
+:m_msgs_xml(NULL),m_ActorMenu(NULL),m_PdaMenu(NULL),m_window(NULL),UIMainIngameWnd(NULL)
 {
 	ShowGameIndicators		(true);
 	ShowCrosshair			(true);
@@ -100,7 +100,7 @@ void CUIGameCustom::OnFrame()
 	if( GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW|HUD_DRAW_RT) )
 		UIMainIngameWnd->Update	();
 
-	m_pMessagesWnd->Update();
+	PdaMenu().m_pMessagesWnd->Update();
 }
 
 void CUIGameCustom::Render()
@@ -133,7 +133,7 @@ void CUIGameCustom::Render()
 			UIMainIngameWnd->Draw();
 	}
 
-	m_pMessagesWnd->Draw();
+	PdaMenu().m_pMessagesWnd->Draw();
 
 	DoRenderDialogs();
 
@@ -219,14 +219,14 @@ void CUIGameCustom::HideActorMenu()
 
 void CUIGameCustom::HideMessagesWindow()
 {
-	if ( m_pMessagesWnd->IsShown() )
-		m_pMessagesWnd->Show(false);
+	if ( PdaMenu().m_pMessagesWnd->IsShown() )
+		PdaMenu().m_pMessagesWnd->Show(false);
 }
 
 void CUIGameCustom::ShowMessagesWindow()
 {
-	if ( !m_pMessagesWnd->IsShown() )
-		m_pMessagesWnd->Show(true);
+	if ( !PdaMenu().m_pMessagesWnd->IsShown() )
+		PdaMenu().m_pMessagesWnd->Show(true);
 }
 
 bool CUIGameCustom::ShowPdaMenu()
@@ -256,7 +256,6 @@ void CUIGameCustom::UnLoad()
 	xr_delete					(m_PdaMenu);
 	xr_delete					(m_window);
 	xr_delete					(UIMainIngameWnd);
-	xr_delete					(m_pMessagesWnd);
 }
 
 void CUIGameCustom::Load()
@@ -279,9 +278,6 @@ void CUIGameCustom::Load()
 		R_ASSERT				(NULL==UIMainIngameWnd);
 		UIMainIngameWnd			= xr_new<CUIMainIngameWnd>	();
 		UIMainIngameWnd->Init	();
-
-		R_ASSERT				(NULL==m_pMessagesWnd);
-		m_pMessagesWnd			= xr_new<CUIMessagesWindow>();
 		
 		Init					(0);
 		Init					(1);
@@ -302,7 +298,7 @@ void CUIGameCustom::OnConnected()
 
 void CUIGameCustom::CommonMessageOut(LPCSTR text)
 {
-	m_pMessagesWnd->AddLogMessage(text);
+	PdaMenu().m_pMessagesWnd->AddLogMessage(text);
 }
 void CUIGameCustom::UpdatePda()
 {

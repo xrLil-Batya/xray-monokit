@@ -16,6 +16,8 @@ bool		IsGameTypeSingle();
 #include "UIInventoryUtilities.h"
 #include "../game_news.h"
 #include "UIPdaMsgListItem.h"
+#include "UIPdaWnd.h"
+#include "UIGameCustom.h"
 
 CUIMessagesWindow::CUIMessagesWindow()
 :m_pChatLog(NULL),m_pChatWnd(NULL),m_pGameLog(NULL)
@@ -63,7 +65,7 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
 	CUIXml									xml;
 	xml.Load								(CONFIG_PATH, UI_PATH, "messages_window.xml");
 	m_pGameLog								= xr_new<CUIGameLog>();
-	m_pGameLog->SetAutoDelete				(true);
+	m_pGameLog->SetAutoDelete				(false);
 	m_pGameLog->Show						(true);
 	AttachChild								(m_pGameLog);
 	if ( IsGameTypeSingle() )
@@ -76,11 +78,11 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
 		CGameFont*							pFont;
 
 		m_pChatLog							= xr_new<CUIGameLog>(); 
-		m_pChatLog->SetAutoDelete			(true);
+		m_pChatLog->SetAutoDelete			(false);
 		m_pChatLog->Show					(true);
 		AttachChild							(m_pChatLog);
 		m_pChatWnd							= xr_new<CUIChatWnd>(); 
-		m_pChatWnd->SetAutoDelete			(true);
+		m_pChatWnd->SetAutoDelete			(false);
 		AttachChild							(m_pChatWnd);
 
 		CUIXmlInit::InitScrollView			(xml, "mp_log_list", 0, m_pGameLog);
@@ -155,4 +157,14 @@ void CUIMessagesWindow::Show(bool show)
 		m_pGameLog->Show(show);
 	if (m_pChatLog)
 		m_pChatLog->Show(show);
+}
+
+void CUIMessagesWindow::Draw()
+{
+	const bool IsPDAShown = CurrentGameUI() && CurrentGameUI()->PdaMenu().IsShown() && CurrentGameUI()->PdaMenu().m_pActiveDialog == this;
+	if (!IsPDAShown || Device.dwFrame == dwMessagesFrame)
+		return;
+
+	dwMessagesFrame = Device.dwFrame;
+	CUIWindow::Draw();
 }

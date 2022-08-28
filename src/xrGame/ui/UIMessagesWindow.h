@@ -30,12 +30,12 @@ public:
 	void				PendingMode						(bool const is_in_pending_mode);
 	CUIChatWnd*			GetChatWnd						() {return m_pChatWnd;}
 	virtual void		Show							(bool show);
-
+	virtual void Draw() override;
 
 protected:
 	virtual void		Init(float x, float y, float width, float height);
 
-
+	u32 dwMessagesFrame;
 	CUIGameLog*			m_pChatLog;
 	CUIChatWnd*			m_pChatWnd;
 	CUIGameLog*			m_pGameLog;

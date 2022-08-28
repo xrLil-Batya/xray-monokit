@@ -99,8 +99,6 @@ protected:
 
 public:
 	CUIMainIngameWnd*	UIMainIngameWnd;
-	CUIMessagesWindow*	m_pMessagesWnd;
-
 
 	CUITalkWnd*			TalkMenu;
 

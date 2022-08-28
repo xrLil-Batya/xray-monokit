@@ -5,6 +5,7 @@
 #include "map_manager.h"
 #include "map_location.h"
 #include "game_cl_capture_the_artefact.h"
+#include "ui/uipdawnd.h"
 
 #define FRIEND_RADION_LOCATION	"mp_friend_radio_location"
 
@@ -28,7 +29,7 @@ void game_cl_CaptureTheArtefact::OnSpeechMessage(NET_Packet& P)
 	{
 		CStringTable st;
 		if (CurrentGameUI())
-			CurrentGameUI()->m_pMessagesWnd->AddChatMessage(*st.translate(*(pMMessage->pMessage)), ps->getName());
+			CurrentGameUI()->PdaMenu().m_pMessagesWnd->AddChatMessage(*st.translate(*(pMMessage->pMessage)), ps->getName());
 
 		if (!Level().MapManager().HasMapLocation(FRIEND_RADION_LOCATION, ps->GameID))
 		{

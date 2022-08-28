@@ -8,6 +8,7 @@
 #include "map_manager.h"	
 #include "map_location.h"
 #include "UIGameCustom.h"
+#include "ui/uipdawnd.h"
 
 void				game_cl_mp::AddMessageMenu			(LPCSTR	menu_section, LPCSTR snd_path, LPCSTR team_prefix)
 {
@@ -156,7 +157,7 @@ void				game_cl_mp::OnSpeechMessage			(NET_Packet& P)
 	{
 		CStringTable st;
 		if (CurrentGameUI())
-			CurrentGameUI()->m_pMessagesWnd->AddChatMessage(st.translate(pMMessage->pMessage.c_str()).c_str(), ps->getName());
+			CurrentGameUI()->PdaMenu().m_pMessagesWnd->AddChatMessage(st.translate(pMMessage->pMessage.c_str()).c_str(), ps->getName());
 
 		if (!Level().MapManager().HasMapLocation(FRIEND_RADION_LOCATION, ps->GameID))
 		{
