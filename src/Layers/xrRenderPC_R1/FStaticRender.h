@@ -207,6 +207,7 @@ public:
 	virtual void					rmNear					();
 	virtual void					rmFar					();
 	virtual void					rmNormal				();
+	void							PdaRenderToTarget() {}; // тупо заглушка, чтоб собиралось.
 
 	// Constructor/destructor/loader
 	CRender							();
