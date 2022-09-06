@@ -136,16 +136,20 @@ void CInventoryOwner::TransferInfo(shared_str info_id, bool add_info) const
 	}
 }
 
+#include "InfoPortionDefs.h"
 bool CInventoryOwner::HasInfo(shared_str info_id) const
 {
-	VERIFY( info_id.size() );
-	const KNOWN_INFO_VECTOR* known_info = m_known_info_registry->registry().objects_ptr ();
-	if(!known_info) return false;
+	VERIFY(info_id.size());
+	const auto known_info = m_known_info_registry->registry().objects();
+	R_ASSERT2(&known_info, "Tvoi porshni xyita, davay po novoy!");
 
-	if(std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) == known_info->end())
-		return false;
+	for(const auto portion : known_info)
+	{
+		if(portion == info_id)
+			return true;
+	}
 
-	return true;
+	return false;
 }
 /*
 bool CInventoryOwner::GetInfo	(shared_str info_id, INFO_DATA& info_data) const
