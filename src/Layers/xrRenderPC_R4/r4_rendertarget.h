@@ -195,8 +195,11 @@ private:
 	ref_shader				s_combine_dbg_1;
 	ref_shader				s_combine_dbg_Accumulator;
 	ref_shader				s_combine;
-   ref_shader				s_combine_msaa[8];
+	ref_shader				s_combine_msaa[8];
 	ref_shader				s_combine_volumetric;
+
+	ref_geom g_rain_drops;
+	ref_shader s_rain_drops;
 public:
 	ref_shader				s_postprocess;
    ref_shader           s_postprocess_msaa;
@@ -302,6 +305,7 @@ public:
 	void						phase_combine			();
 	void						phase_combine_volumetric();
 	void						phase_pp				();
+	void PhaseRainDrops();
 
 	virtual void				set_blur				(float	f)		{ param_blur=f;						}
 	virtual void				set_gray				(float	f)		{ param_gray=f;						}
