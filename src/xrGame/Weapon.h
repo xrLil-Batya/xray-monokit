@@ -319,6 +319,13 @@ protected:
 	IC		void			UpdateFireDependencies	()			{ if (dwFP_Frame==Device.dwFrame) return; UpdateFireDependencies_internal(); };
 
 	virtual void			LoadFireParams		(LPCSTR section);
+
+private:
+	// Прыжок
+	Fvector m_jump_offset[2]{}, m_fall_offset[2]{}, m_landing_offset[2]{}, m_landing2_offset[2]{};
+	float fJumpMaxTime{}, fFallMaxTime{}, fLandingMaxTime{}, fLanding2MaxTime{};
+	float m_fJump_MovingFactor{}, m_fFall_MovingFactor{}, m_fLanding_MovingFactor{}, m_fLanding2_MovingFactor{};
+
 public:	
 	IC		const Fvector&	get_LastFP				()			{ UpdateFireDependencies(); return m_current_firedeps.vLastFP;	}
 	IC		const Fvector&	get_LastFP2				()			{ UpdateFireDependencies(); return m_current_firedeps.vLastFP2;	}

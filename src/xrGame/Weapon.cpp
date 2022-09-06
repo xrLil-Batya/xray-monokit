@@ -548,6 +548,36 @@ void CWeapon::Load		(LPCSTR section)
 	m_zoom_params.m_bUseDynamicZoom				= READ_IF_EXISTS(pSettings,r_bool,section,"scope_dynamic_zoom",FALSE);
 	m_zoom_params.m_sUseZoomPostprocess			= 0;
 	m_zoom_params.m_sUseBinocularVision			= 0;
+
+	//////////////// Прыжок ////////////////////
+	m_jump_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "hud_move_jump_offset_pos", (Fvector{ 0.f, 0.05f, 0.03f }));
+	m_jump_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "hud_move_jump_offset_rot", (Fvector{ 0.f, -10.f, -10.f }));
+	fJumpMaxTime = READ_IF_EXISTS(pSettings, r_float, section, "jump_transition_time", 0.26f);
+
+	m_fall_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "hud_move_fall_offset_pos", (Fvector{ 0.f, -0.05f, 0.06f }));
+	m_fall_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "hud_move_fall_offset_rot", (Fvector{ 0.f, 5.f, 0.f }));
+	fFallMaxTime = READ_IF_EXISTS(pSettings, r_float, section, "fall_transition_time", 0.6f);
+
+	m_landing_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "hud_move_landing_offset_pos", (Fvector{ 0.f, -0.2f, 0.03f }));
+	m_landing_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "hud_move_landing_offset_rot", (Fvector{ 0.f, -5.f, 10.f }));
+	fLandingMaxTime = READ_IF_EXISTS(pSettings, r_float, section, "landing_transition_time", 0.7f);
+
+	m_landing2_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "hud_move_landing2_offset_pos", (Fvector{ 0.f, -0.3f, 0.03f }));
+	m_landing2_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "hud_move_landing2_offset_rot", (Fvector{ 0.f, -13.f, 20.f }));
+	fLanding2MaxTime = READ_IF_EXISTS(pSettings, r_float, section, "landing2_transition_time", 0.7f);
+
+	if (fJumpMaxTime <= EPS)
+		fJumpMaxTime = 0.01f;
+
+	if (fFallMaxTime <= EPS)
+		fFallMaxTime = 0.01f;
+
+	if (fLandingMaxTime <= EPS)
+		fLandingMaxTime = 0.01f;
+
+	if (fLanding2MaxTime <= EPS)
+		fLanding2MaxTime = 0.01f;
+	////////////////////////////////////////////
 }
 
 void CWeapon::LoadFireParams		(LPCSTR section)
@@ -1754,14 +1784,19 @@ bool CWeapon::ready_to_kill	() const
 
 void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 {
-	CActor* pActor	= smart_cast<CActor*>(H_Parent());
-	if(!pActor)		return;
+	CActor* pActor = smart_cast<CActor*>(H_Parent());
+	if(!pActor)
+		return;
 
+	Fvector summary_offset{}, summary_rotate{};
+	const u32 iMovingState = pActor->MovingState();
+
+	u8 idx = GetCurrentHudOffsetIdx();
+	const bool b_aiming = idx != 1;
 
 	if(		(IsZoomed() && m_zoom_params.m_fZoomRotationFactor<=1.f) ||
 			(!IsZoomed() && m_zoom_params.m_fZoomRotationFactor>0.f))
 	{
-		u8 idx = GetCurrentHudOffsetIdx();
 //		if(idx==0)					return;
 
 		attachable_hud_item*		hi = HudItemData();
@@ -1795,6 +1830,192 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 
 		clamp(m_zoom_params.m_fZoomRotationFactor, 0.f, 1.f);
 	}
+	
+JUMP_EFFECT:
+	//=============== Эффекты прыжка ===============//
+	{
+		const float fJumpPerUpd = Device.fTimeDelta / fJumpMaxTime; // Величина изменение фактора смещения худа при прыжке
+		const float fFallPerUpd = Device.fTimeDelta / fFallMaxTime; // Величина изменение фактора смещения худа при падении
+		const float fLandingPerUpd = Device.fTimeDelta / fLandingMaxTime; // Величина изменение фактора смещения худа при приземлении (стадия 1)
+		const float fLanding2PerUpd = Device.fTimeDelta / fLanding2MaxTime; // Величина изменение фактора смещения худа при приземлении (стадия 2)
+
+		if (iMovingState & mcJump)
+		{ // Прыжок
+			m_fJump_MovingFactor += fJumpPerUpd;
+			m_fFall_MovingFactor -= fJumpPerUpd;
+			m_fLanding_MovingFactor -= fJumpPerUpd;
+			m_fLanding2_MovingFactor -= fJumpPerUpd;
+
+			clamp(m_fFall_MovingFactor, 0.0f, 1.0f);
+			clamp(m_fLanding_MovingFactor, 0.0f, 1.0f);
+			clamp(m_fLanding2_MovingFactor, 0.0f, 1.0f);
+		}
+		else if (iMovingState & mcFall)
+		{ // Падание
+			m_fJump_MovingFactor -= fFallPerUpd;
+			m_fFall_MovingFactor += fFallPerUpd;
+			m_fLanding_MovingFactor -= fFallPerUpd;
+			m_fLanding2_MovingFactor -= fFallPerUpd;
+
+			clamp(m_fJump_MovingFactor, 0.0f, 1.0f);
+			clamp(m_fLanding_MovingFactor, 0.0f, 1.0f);
+			clamp(m_fLanding2_MovingFactor, 0.0f, 1.0f);
+		}
+		else if (iMovingState & mcLanding)
+		{ // Приземление
+			m_fJump_MovingFactor -= fLandingPerUpd;
+			m_fFall_MovingFactor -= fLandingPerUpd;
+			m_fLanding_MovingFactor += fLandingPerUpd;
+			m_fLanding2_MovingFactor -= fLandingPerUpd;
+
+			clamp(m_fJump_MovingFactor, 0.0f, 1.0f);
+			clamp(m_fFall_MovingFactor, 0.0f, 1.0f);
+			clamp(m_fLanding2_MovingFactor, 0.0f, 1.0f);
+		}
+		else if (iMovingState & mcLanding2)
+		{ // Приземление
+			m_fJump_MovingFactor -= fLanding2PerUpd;
+			m_fFall_MovingFactor -= fLanding2PerUpd;
+			m_fLanding_MovingFactor -= fLanding2PerUpd;
+			m_fLanding2_MovingFactor += fLanding2PerUpd;
+
+			clamp(m_fJump_MovingFactor, 0.0f, 1.0f);
+			clamp(m_fFall_MovingFactor, 0.0f, 1.0f);
+			clamp(m_fLanding_MovingFactor, 0.0f, 1.0f);
+		}
+		else
+		{ // Двигаемся в любом другом направлении
+			if (m_fJump_MovingFactor < 0.0f) // для прыжка
+			{
+				m_fJump_MovingFactor += fJumpPerUpd;
+				clamp(m_fJump_MovingFactor, -1.0f, 0.0f);
+			}
+			else
+			{
+				m_fJump_MovingFactor -= fJumpPerUpd;
+				clamp(m_fJump_MovingFactor, 0.0f, 1.0f);
+			}
+			
+			if (m_fFall_MovingFactor < 0.0f) // для падения
+			{
+				m_fFall_MovingFactor += fFallPerUpd;
+				clamp(m_fFall_MovingFactor, -1.0f, 0.0f);
+			}
+			else
+			{
+				m_fFall_MovingFactor -= fFallPerUpd;
+				clamp(m_fFall_MovingFactor, 0.0f, 1.0f);
+			}
+			
+			if (m_fLanding_MovingFactor < 0.0f) // для приземления (стадия 1)
+			{
+				m_fLanding_MovingFactor += fLandingPerUpd;
+				clamp(m_fLanding_MovingFactor, -1.0f, 0.0f);
+			}
+			else
+			{
+				m_fLanding_MovingFactor -= fLandingPerUpd;
+				clamp(m_fLanding_MovingFactor, 0.0f, 1.0f);
+			}
+			
+			if (m_fLanding2_MovingFactor < 0.0f) // для приземления (стадия 2)
+			{
+				m_fLanding2_MovingFactor += fLanding2PerUpd;
+				clamp(m_fLanding2_MovingFactor, -1.0f, 0.0f);
+			}
+			else
+			{
+				m_fLanding2_MovingFactor -= fLanding2PerUpd;
+				clamp(m_fLanding2_MovingFactor, 0.0f, 1.0f);
+			}
+		}
+
+		// не должен превышать эти лимиты
+		clamp(m_fJump_MovingFactor, -1.0f, 1.0f);
+		clamp(m_fFall_MovingFactor, -1.0f, 1.0f);
+		clamp(m_fLanding_MovingFactor, -1.0f, 1.0f);
+		clamp(m_fLanding2_MovingFactor, -1.0f, 1.0f);
+
+		// Смещение позиции худа в прыжке
+		Fvector jump_offs = m_jump_offset[0]; //pos
+		jump_offs.mul(m_fJump_MovingFactor); // Умножаем на фактор эффекта
+		// Поворот худа в прыжке
+		Fvector jump_rot = m_jump_offset[1]; //rot
+		jump_rot.mul(-PI / 180.f); // Преобразуем углы в радианы
+		jump_rot.mul(m_fJump_MovingFactor); // Умножаем на фактор эффекта
+
+		// Смещение позиции худа в падении
+		Fvector fall_offs = m_fall_offset[0]; //pos
+		fall_offs.mul(m_fFall_MovingFactor); // Умножаем на фактор эффекта
+		// Поворот худа в падении
+		Fvector fall_rot = m_fall_offset[1]; //rot
+		fall_rot.mul(-PI / 180.f); // Преобразуем углы в радианы
+		fall_rot.mul(m_fFall_MovingFactor); // Умножаем на фактор эффекта
+
+		// Смещение позиции худа в приземлении (стадия 1)
+		Fvector landing_offs = m_landing_offset[0]; //pos
+		landing_offs.mul(m_fLanding_MovingFactor); // Умножаем на фактор эффекта
+		// Поворот худа в приземлении (стадия 1)
+		Fvector landing_rot = m_landing_offset[1]; //rot
+		landing_rot.mul(-PI / 180.f); // Преобразуем углы в радианы
+		landing_rot.mul(m_fLanding_MovingFactor); // Умножаем на фактор эффекта
+
+		// Смещение позиции худа в приземлении (стадия 2)
+		Fvector landing2_offs = m_landing2_offset[0]; //pos
+		landing2_offs.mul(m_fLanding2_MovingFactor); // Умножаем на фактор эффекта
+		// Поворот худа в приземлении (стадия 2)
+		Fvector landing2_rot = m_landing2_offset[1]; //rot
+		landing2_rot.mul(-PI / 180.f); // Преобразуем углы в радианы
+		landing2_rot.mul(m_fLanding2_MovingFactor); // Умножаем на фактор эффекта
+
+		// Применяем
+		summary_offset.add(jump_offs);
+		summary_rotate.add(jump_rot);
+
+		summary_offset.add(fall_offs);
+		summary_rotate.add(fall_rot);
+
+		summary_offset.add(landing_offs);
+		summary_rotate.add(landing_rot);
+
+		summary_offset.add(landing2_offs);
+		summary_rotate.add(landing2_rot);
+	}
+	//====================================================//
+
+APPLY_EFFECTS:
+	//================ Применение эффектов ===============//
+	{
+		// поворот с сохранением смещения by Zander
+		Fvector _angle{}, _pos{ trans.c };
+		trans.getHPB(_angle);
+		_angle.add(Fvector().set(-summary_rotate.x, -summary_rotate.y, -summary_rotate.z));
+		//Msg("##[%s] summary_rotate: [%f,%f,%f]", __FUNCTION__, summary_rotate.x, summary_rotate.y, summary_rotate.z);
+		trans.setHPB(_angle.x, _angle.y, _angle.z);
+		trans.c = _pos;
+
+		Fmatrix hud_rotation;
+		hud_rotation.identity();
+
+		if (b_aiming)
+		{
+			hud_rotation.rotateX(HudItemData()->m_measures.m_hands_offset[2][idx].x);
+
+			Fmatrix hud_rotation_y;
+			hud_rotation_y.identity();
+			hud_rotation_y.rotateY(HudItemData()->m_measures.m_hands_offset[2][idx].y);
+			hud_rotation.mulA_43(hud_rotation_y);
+
+			hud_rotation_y.identity();
+			hud_rotation_y.rotateZ(HudItemData()->m_measures.m_hands_offset[2][idx].z);
+			hud_rotation.mulA_43(hud_rotation_y);
+			//Msg("~~[%s] zr_rot: [%f,%f,%f]", __FUNCTION__, zr_rot.x, zr_rot.y, zr_rot.z);
+		}
+		//Msg("--[%s] summary_offset: [%f,%f,%f]", __FUNCTION__, summary_offset.x, summary_offset.y, summary_offset.z);
+		hud_rotation.translate_over(summary_offset);
+		trans.mulB_43(hud_rotation);
+	}
+	//====================================================//
 }
 
 void CWeapon::SetAmmoElapsed(int ammo_count)
