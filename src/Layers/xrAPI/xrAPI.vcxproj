@@ -109,7 +109,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -117,7 +117,7 @@
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
       <ImportLibrary>$(OutDir)LIBS\$(TargetName).lib</ImportLibrary>
-      <ProgramDatabaseFile>$(OutDir)PDB\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">

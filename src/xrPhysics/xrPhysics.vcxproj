@@ -142,8 +142,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)PDB\$(ProjectName).pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
       <MapFileName />
       <SubSystem>NotSet</SubSystem>

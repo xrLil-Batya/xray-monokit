@@ -124,8 +124,8 @@
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>xrD3D9-Null.def </ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)PDB\$(ProjectName).pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
       <MapFileName />
       <SubSystem>Windows</SubSystem>

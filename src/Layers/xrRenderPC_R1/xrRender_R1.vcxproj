@@ -140,8 +140,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)PDB\$(ProjectName).pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
       <MapFileName />
       <SubSystem>NotSet</SubSystem>

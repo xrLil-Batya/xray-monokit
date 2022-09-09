@@ -431,7 +431,7 @@
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreSpecificDefaultLibraries>libcmt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <GenerateMapFile>false</GenerateMapFile>
       <MapFileName />
       <SubSystem>NotSet</SubSystem>
@@ -443,6 +443,7 @@
       <DataExecutionPrevention />
       <ImportLibrary />
       <AdditionalLibraryDirectories>$(SolutionDir)..\bins\libs\;$(SolutionDir)\..\binares\Win32-Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

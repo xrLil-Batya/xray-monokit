@@ -92,7 +92,7 @@
       <DisableSpecificWarnings>4996;4530;4100;4714;4127;4055;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <GenerateMapFile>false</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -101,7 +101,7 @@
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
       <ImportLibrary>$(OutDir)LIBS\$(TargetName).lib</ImportLibrary>
-      <ProgramDatabaseFile>$(OutDir)PDB\$(TargetName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">

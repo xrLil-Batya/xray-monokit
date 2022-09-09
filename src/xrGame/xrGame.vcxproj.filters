@@ -7434,6 +7434,8 @@
     <ClInclude Include="UI_AnimMode.h">
       <Filter>UI\GameTypes\FreeMp\RP_ANIMATION_MODE</Filter>
     </ClInclude>
+    <ClInclude Include="VoiceChat.h" />
+    <ClInclude Include="VoiceSender.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -11126,6 +11128,8 @@
     <ClCompile Include="ActorAnimation_Scripts.cpp">
       <Filter>Core\Client\Objects\actor\base</Filter>
     </ClCompile>
+    <ClCompile Include="VoiceChat.cpp" />
+    <ClCompile Include="VoiceSender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">

@@ -138,8 +138,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>dxguid.lib;d3dx11.lib;D3DCompiler.lib;d3d11.lib;dxgi.lib;nvapi.lib;dxerr.lib;d3d10.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)PDB\$(ProjectName).pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
       <MapFileName />
       <SubSystem>NotSet</SubSystem>
