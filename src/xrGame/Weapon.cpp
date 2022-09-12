@@ -1781,8 +1781,7 @@ bool CWeapon::ready_to_kill	() const
 	);
 }
 
-
-void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
+void CWeapon::UpdateHudAdditonal(Fmatrix& trans)
 {
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
 	if(!pActor)
@@ -1792,16 +1791,15 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 	const u32 iMovingState = pActor->MovingState();
 
 	u8 idx = GetCurrentHudOffsetIdx();
-	const bool b_aiming = idx != 1;
+	const bool b_aiming = idx == 1;
 
-	if(		(IsZoomed() && m_zoom_params.m_fZoomRotationFactor<=1.f) ||
-			(!IsZoomed() && m_zoom_params.m_fZoomRotationFactor>0.f))
+	Fvector curr_offs{}, curr_rot{};
+	if(b_aiming)
 	{
 //		if(idx==0)					return;
 
 		attachable_hud_item*		hi = HudItemData();
 		R_ASSERT					(hi);
-		Fvector						curr_offs, curr_rot;
 		curr_offs					= hi->m_measures.m_hands_offset[0][idx];//pos,aim
 		curr_rot					= hi->m_measures.m_hands_offset[1][idx];//rot,aim
 		curr_offs.mul				(m_zoom_params.m_fZoomRotationFactor);
@@ -1989,7 +1987,7 @@ APPLY_EFFECTS:
 		// поворот с сохранением смещения by Zander
 		Fvector _angle{}, _pos{ trans.c };
 		trans.getHPB(_angle);
-		_angle.add(Fvector().set(-summary_rotate.x, -summary_rotate.y, -summary_rotate.z));
+		_angle.add(Fvector{-summary_rotate.x, -summary_rotate.y, -summary_rotate.z});
 		//Msg("##[%s] summary_rotate: [%f,%f,%f]", __FUNCTION__, summary_rotate.x, summary_rotate.y, summary_rotate.z);
 		trans.setHPB(_angle.x, _angle.y, _angle.z);
 		trans.c = _pos;
@@ -1999,15 +1997,15 @@ APPLY_EFFECTS:
 
 		if (b_aiming)
 		{
-			hud_rotation.rotateX(HudItemData()->m_measures.m_hands_offset[2][idx].x);
+			hud_rotation.rotateX(curr_offs.x);
 
 			Fmatrix hud_rotation_y;
 			hud_rotation_y.identity();
-			hud_rotation_y.rotateY(HudItemData()->m_measures.m_hands_offset[2][idx].y);
+			hud_rotation_y.rotateY(curr_offs.y);
 			hud_rotation.mulA_43(hud_rotation_y);
 
 			hud_rotation_y.identity();
-			hud_rotation_y.rotateZ(HudItemData()->m_measures.m_hands_offset[2][idx].z);
+			hud_rotation_y.rotateZ(curr_offs.z);
 			hud_rotation.mulA_43(hud_rotation_y);
 			//Msg("~~[%s] zr_rot: [%f,%f,%f]", __FUNCTION__, zr_rot.x, zr_rot.y, zr_rot.z);
 		}
@@ -2209,16 +2207,8 @@ void CWeapon::OnAnimationEnd(u32 state)
 
 u8 CWeapon::GetCurrentHudOffsetIdx()
 {
-	CActor* pActor	= smart_cast<CActor*>(H_Parent());
-	if(!pActor)		return 0;
-	
-	bool b_aiming		= 	((IsZoomed() && m_zoom_params.m_fZoomRotationFactor<=1.f) ||
-							(!IsZoomed() && m_zoom_params.m_fZoomRotationFactor>0.f));
-
-	if(!b_aiming)
-		return		0;
-	else
-		return		1;
+	const bool b_aiming = ((IsZoomed() && m_zoom_params.m_fZoomRotationFactor <= 1.f) || (!IsZoomed() && m_zoom_params.m_fZoomRotationFactor > 0.f));
+	return	b_aiming;
 }
 
 void CWeapon::render_hud_mode()
