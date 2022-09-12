@@ -90,16 +90,15 @@ void moving_bones_snd_player::update( float time_delta, CGameObject &object )
 	
 
 	sound.set_frequency( frequency_factor );
-	sound.set_position( new_position.c );
+	
+	const auto pos = (&new_position && &new_position.c) ? new_position.c : Fvector{ 0, 0, 0 };
+	sound.set_position(pos);
 
-	if( smothed_velocity< play_threthhold )
-					sound.stop_deffered();
+	if(smothed_velocity < play_threthhold)
+		sound.stop_deffered();
 
-
-	previous_position.set( new_position );
-
+	previous_position.set(&new_position ? new_position : Fmatrix());
 }
-
 
 void moving_bones_snd_player::play( CGameObject &O )
 {
