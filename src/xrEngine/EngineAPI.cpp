@@ -6,23 +6,23 @@
 #include "EngineAPI.h"
 #include "../xrcdb/xrXRC.h"
 
-#include "securom_api.h"
-
 extern xr_token* vid_quality_token;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-void __cdecl dummy		(void)	{
+void __cdecl dummy()
+{
 };
+
 CEngineAPI::CEngineAPI	()
 {
-	hGame			= 0;
-	hRender			= 0;
-	hTuner			= 0;
-	pCreate			= 0;
-	pDestroy		= 0;
+	hGame			= nullptr;
+	hRender			= nullptr;
+	hTuner			= nullptr;
+	pCreate			= nullptr;
+	pDestroy		= nullptr;
 	tune_pause		= dummy	;
 	tune_resume		= dummy	;
 }
@@ -37,7 +37,7 @@ CEngineAPI::~CEngineAPI()
 			xr_free					(vid_quality_token[i].name);
 		}
 		xr_free						(vid_quality_token);
-		vid_quality_token			= NULL;
+		vid_quality_token			= nullptr;
 	}
 }
 
@@ -47,13 +47,7 @@ ENGINE_API int g_current_renderer = 0;
 ENGINE_API bool is_enough_address_space_available	()
 {
 	SYSTEM_INFO		system_info;
-
-	SECUROM_MARKER_HIGH_SECURITY_ON(12)
-
 	GetSystemInfo	( &system_info );
-
-	SECUROM_MARKER_HIGH_SECURITY_OFF(12)
-
 	return			(*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;	
 }
 
@@ -61,22 +55,20 @@ ENGINE_API bool is_enough_address_space_available	()
 
 void CEngineAPI::InitializeNotDedicated()
 {
-	SECUROM_MARKER_HIGH_SECURITY_ON(2)
-
-	LPCSTR			r2_name	= "xrRender_R2.dll";
-	LPCSTR			r3_name	= "xrRender_R3.dll";
-	LPCSTR			r4_name	= "xrRender_R4.dll";
+	constexpr const char* r2_name	= "xrRender_R2.dll";
+	constexpr const char* r3_name	= "xrRender_R3.dll";
+	constexpr const char* r4_name	= "xrRender_R4.dll";
 
 	if (psDeviceFlags.test(rsR4))
 	{
 		// try to initialize R4
 		Log				("Loading DLL:",	r4_name);
 		hRender			= LoadLibrary		(r4_name);
-		if (0==hRender)	
+		if (!hRender)	
 		{
 			// try to load R1
 			Msg			("! ...Failed - incompatible hardware/pre-Vista OS.");
-			psDeviceFlags.set	(rsR2,TRUE);
+			psDeviceFlags.set	(rsR2,true);
 		}
 	}
 
@@ -85,11 +77,11 @@ void CEngineAPI::InitializeNotDedicated()
 		// try to initialize R3
 		Log				("Loading DLL:",	r3_name);
 		hRender			= LoadLibrary		(r3_name);
-		if (0==hRender)	
+		if (!hRender)	
 		{
 			// try to load R1
 			Msg			("! ...Failed - incompatible hardware/pre-Vista OS.");
-			psDeviceFlags.set	(rsR2,TRUE);
+			psDeviceFlags.set	(rsR2,true);
 		}
 		else
 			g_current_renderer	= 3;
@@ -98,11 +90,11 @@ void CEngineAPI::InitializeNotDedicated()
 	if (psDeviceFlags.test(rsR2))	
 	{
 		// try to initialize R2
-		psDeviceFlags.set	(rsR4,FALSE);
-		psDeviceFlags.set	(rsR3,FALSE);
+		psDeviceFlags.set	(rsR4,false);
+		psDeviceFlags.set	(rsR3,false);
 		Log				("Loading DLL:",	r2_name);
 		hRender			= LoadLibrary		(r2_name);
-		if (0==hRender)	
+		if (!hRender)	
 		{
 			// try to load R1
 			Msg			("! ...Failed - incompatible hardware.");
@@ -110,34 +102,32 @@ void CEngineAPI::InitializeNotDedicated()
 		else
 			g_current_renderer	= 2;
 	}
-
-	SECUROM_MARKER_HIGH_SECURITY_OFF(2)
 }
 #endif // DEDICATED_SERVER
 
-
-void CEngineAPI::Initialize(void)
+void CEngineAPI::Initialize()
 {
 	//////////////////////////////////////////////////////////////////////////
 	// render
-	LPCSTR			r1_name	= "xrRender_R1.dll";
+	constexpr const char* r1_name = "xrRender_R1.dll";
 
 	#ifndef DEDICATED_SERVER
 		InitializeNotDedicated();
 	#endif // DEDICATED_SERVER
 
-	if (0==hRender)		
+	if (!hRender)		
 	{
 		// try to load R1
-		psDeviceFlags.set	(rsR4,FALSE);
-		psDeviceFlags.set	(rsR3,FALSE);
-		psDeviceFlags.set	(rsR2,FALSE);
+		psDeviceFlags.set	(rsR4,false);
+		psDeviceFlags.set	(rsR3,false);
+		psDeviceFlags.set	(rsR2,false);
 		renderer_value		= 0; //con cmd
 
 		Log				("Loading DLL:",	r1_name);
 		hRender			= LoadLibrary		(r1_name);
-		if (0==hRender)	R_CHK				(GetLastError());
-		R_ASSERT		(hRender);
+		if (!hRender)
+			R_CHK				(GetLastError());
+		R_ASSERT(hRender);
 		g_current_renderer	= 1;
 	}
 
@@ -145,36 +135,45 @@ void CEngineAPI::Initialize(void)
 
 	// game	
 	{
-		LPCSTR			g_name	= "xrGame.dll";
+		constexpr const char* g_name = "xrGame.dll";
 		Log				("Loading DLL:",g_name);
 		hGame			= LoadLibrary	(g_name);
-		if (0==hGame)	R_CHK			(GetLastError());
+		if (!hGame)
+			R_CHK(GetLastError());
 		R_ASSERT2		(hGame,"Game DLL raised exception during loading or there is no game DLL at all");
-		pCreate			= (Factory_Create*)		GetProcAddress(hGame,"xrFactory_Create"		);	R_ASSERT(pCreate);
-		pDestroy		= (Factory_Destroy*)	GetProcAddress(hGame,"xrFactory_Destroy"	);	R_ASSERT(pDestroy);
+		pCreate			= reinterpret_cast<Factory_Create*>(GetProcAddress(hGame,"xrFactory_Create"));
+		R_ASSERT(pCreate);
+		pDestroy		= reinterpret_cast<Factory_Destroy*>(GetProcAddress(hGame,"xrFactory_Destroy"));
+		R_ASSERT(pDestroy);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// vTune
-	tune_enabled		= FALSE;
+	tune_enabled = false;
 	if (strstr(Core.Params,"-tune"))	{
-		LPCSTR			g_name	= "vTuneAPI.dll";
-		Log				("Loading DLL:",g_name);
+		constexpr const char* g_name = "vTuneAPI.dll";
+		Log				("Loading DLL:", g_name);
 		hTuner			= LoadLibrary	(g_name);
-		if (0==hTuner)	R_CHK			(GetLastError());
+		if (!hTuner)
+			R_CHK(GetLastError());
 		R_ASSERT2		(hTuner,"Intel vTune is not installed");
-		tune_enabled	= TRUE;
-		tune_pause		= (VTPause*)	GetProcAddress(hTuner,"VTPause"		);	R_ASSERT(tune_pause);
-		tune_resume		= (VTResume*)	GetProcAddress(hTuner,"VTResume"	);	R_ASSERT(tune_resume);
+		tune_enabled	= true;
+		tune_pause		= reinterpret_cast<VTPause*>(GetProcAddress(hTuner,"VTPause"));
+		R_ASSERT(tune_pause);
+		tune_resume		= reinterpret_cast<VTResume*>(GetProcAddress(hTuner,"VTResume"));
+		R_ASSERT(tune_resume);
 	}
 }
 
-void CEngineAPI::Destroy	(void)
+void CEngineAPI::Destroy	()
 {
-	if (hGame)				{ FreeLibrary(hGame);	hGame	= 0; }
-	if (hRender)			{ FreeLibrary(hRender); hRender = 0; }
-	pCreate					= 0;
-	pDestroy				= 0;
+	R_ASSERT(hGame && hRender);
+	FreeLibrary(hGame);
+	hGame = nullptr;
+	FreeLibrary(hRender);
+	hRender = nullptr;
+	pCreate = nullptr;
+	pDestroy = nullptr;
 	Engine.Event._destroy	();
 	XRC.r_clear_compact		();
 }
@@ -195,21 +194,24 @@ void CEngineAPI::CreateRendererList()
 	vid_quality_token[0].name		= xr_strdup("renderer_r1");
 
 	vid_quality_token[1].id			= -1;
-	vid_quality_token[1].name		= NULL;
+	vid_quality_token[1].name		= nullptr;
 
 #else
 	//	TODO: ask renderers if they are supported!
-	if(vid_quality_token != NULL)		return;
+	if(vid_quality_token)
+		return;
+
 	bool bSupports_r2 = false;
 	bool bSupports_r2_5 = false;
 	bool bSupports_r3 = false;
 	bool bSupports_r4 = false;
 
-	LPCSTR			r2_name	= "xrRender_R2.dll";
-	LPCSTR			r3_name	= "xrRender_R3.dll";
-	LPCSTR			r4_name	= "xrRender_R4.dll";
+	constexpr const char* r2_name = "xrRender_R2.dll";
+	constexpr const char* r3_name = "xrRender_R3.dll";
+	constexpr const char* r4_name = "xrRender_R4.dll";
 
-	if (strstr(Core.Params,"-perfhud_hack"))
+	// i-love-kfc: вырубил
+	if (false && strstr(Core.Params,"-perfhud_hack"))
 	{
 		bSupports_r2 = true;
 		bSupports_r2_5 = true;
@@ -224,7 +226,7 @@ void CEngineAPI::CreateRendererList()
 		if (hRender)	
 		{
 			bSupports_r2 = true;
-			SupportsAdvancedRendering *test_rendering = (SupportsAdvancedRendering*) GetProcAddress(hRender,"SupportsAdvancedRendering");	
+			const auto test_rendering = reinterpret_cast<SupportsAdvancedRendering*>(GetProcAddress(hRender,"SupportsAdvancedRendering"));
 			R_ASSERT(test_rendering);
 			bSupports_r2_5 = test_rendering();
 			FreeLibrary(hRender);
@@ -239,7 +241,7 @@ void CEngineAPI::CreateRendererList()
 		SetErrorMode(0);
 		if (hRender)	
 		{
-			SupportsDX10Rendering *test_dx10_rendering = (SupportsDX10Rendering*) GetProcAddress(hRender,"SupportsDX10Rendering");
+			const auto test_dx10_rendering = reinterpret_cast<SupportsDX10Rendering*>(GetProcAddress(hRender,"SupportsDX10Rendering"));
 			R_ASSERT(test_dx10_rendering);
 			bSupports_r3 = test_dx10_rendering();
 			FreeLibrary(hRender);
@@ -254,7 +256,7 @@ void CEngineAPI::CreateRendererList()
 		SetErrorMode	(0);
 		if (hRender)	
 		{
-			SupportsDX11Rendering *test_dx11_rendering = (SupportsDX11Rendering*) GetProcAddress(hRender,"SupportsDX11Rendering");
+			const auto test_dx11_rendering = reinterpret_cast<SupportsDX11Rendering*>(GetProcAddress(hRender,"SupportsDX11Rendering"));
 			R_ASSERT(test_dx11_rendering);
 			bSupports_r4 = test_dx11_rendering();
 			FreeLibrary(hRender);
@@ -291,8 +293,8 @@ void CEngineAPI::CreateRendererList()
 
 		if (bBreakLoop) break;
 
-		_tmp.push_back				(NULL);
-		LPCSTR val					= NULL;
+		_tmp.push_back				(nullptr);
+		LPCSTR val					= nullptr;
 		switch (i)
 		{
 		case 0: val ="renderer_r1";			break;
@@ -309,7 +311,7 @@ void CEngineAPI::CreateRendererList()
 	vid_quality_token						= xr_alloc<xr_token>(_cnt);
 
 	vid_quality_token[_cnt-1].id			= -1;
-	vid_quality_token[_cnt-1].name			= NULL;
+	vid_quality_token[_cnt-1].name			= nullptr;
 
 #ifdef DEBUG
 	Msg("Available render modes[%d]:",_tmp.size());
