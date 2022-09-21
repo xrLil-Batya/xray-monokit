@@ -58,7 +58,7 @@ void DiscordRPC::Update()
 	if (!m_hDiscordDLL) return;
 
 	DiscordRichPresence presenseInfo{};
-	presenseInfo.startTimestamp = start_time; //время с момента запуска
+	presenseInfo.endTimestamp = start_time; //время с момента запуска
 	presenseInfo.largeImageKey = "2"; //большая картинка
 	presenseInfo.smallImageKey = "1"; //маленькая картинка
 	presenseInfo.smallImageText = "Online"; //версия движка на маленькой картинке
