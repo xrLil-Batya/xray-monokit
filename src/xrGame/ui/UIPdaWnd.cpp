@@ -534,6 +534,18 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
 	if (WINDOW_KEY_PRESSED == keyboard_action && IsShown())
 	{
+		if (!psActorFlags.test(AF_3D_PDA))
+		{
+			EGameActions action = get_binded_action(dik);
+
+			if (action == kQUIT || action == kINVENTORY || action == kACTIVE_JOBS)
+			{
+				HideDialog();
+				return true;
+			}
+			return inherited::OnKeyboardAction(dik, keyboard_action);
+		}
+
 		const auto pActor = smart_cast<CActor*>(Level().CurrentEntity());
 		if (!pActor)
 			return inherited::OnKeyboardAction(dik, keyboard_action);

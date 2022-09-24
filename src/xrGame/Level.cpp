@@ -803,7 +803,7 @@ void CLevel::OnRender()
 	if (game && CurrentGameUI() && &CurrentGameUI()->PdaMenu() != nullptr)
 	{
 		CUIPdaWnd* pda = &CurrentGameUI()->PdaMenu();
-		if (pda->IsShown())
+		if (psActorFlags.test(AF_3D_PDA) && pda->IsShown())
 		{
 			pda->Draw();
 			CUICursor* cursor = &UI().GetUICursor();

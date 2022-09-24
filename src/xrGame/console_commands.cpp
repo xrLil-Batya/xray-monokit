@@ -1863,6 +1863,13 @@ void CCC_RegisterCommands()
 	CMD1(CCC_GameDifficulty,	"g_game_difficulty"		);
 
 	CMD3(CCC_Mask,				"g_backrun",			&psActorFlags,	AF_RUN_BACKWARD);
+	if(psDeviceFlags.test(rsR4))
+	{
+		psActorFlags.set(AF_3D_PDA, true);
+		CMD3(CCC_Mask, "g_3d_pda", &psActorFlags, AF_3D_PDA);
+	}
+	else
+		psActorFlags.set(AF_3D_PDA, false);
 
 	// alife
 #ifdef DEBUG

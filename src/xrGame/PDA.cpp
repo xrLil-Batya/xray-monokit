@@ -126,9 +126,6 @@ void CPda::OnStateSwitch(u32 S)
 		g_player_hud->reset_thumb(true);
 		if(pda && pda->IsShown())
 		{
-			/*if (pda->IsShown())
-				pda->Enable(true);
-			pda->ResetJoystick(true);*/
 			pda->HideDialog();
 		}
 		
@@ -260,6 +257,13 @@ void CPda::UpdateCL()
 
 	if (!ParentIsActor())
 		return;
+
+	if (!psActorFlags.test(AF_3D_PDA))
+	{
+		if (GetState() != eHidden)
+			Actor()->inventory().Activate(NO_ACTIVE_SLOT);
+		return;
+	}
 
 	bool b_main_menu_is_active = (g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive());
 

@@ -10,13 +10,15 @@
 #include "ui/UIStatic.h"
 #include "ui/UIXmlInit.h"
 #include "UI_AnimMode.h"
+#include "Inventory.h"
+#include "ui/UIPdaWnd.h"
 
-BOOL g_cl_draw_mp_statistic = FALSE;
+BOOL g_cl_draw_mp_statistic = false;
 
 CUIGameFMP::CUIGameFMP()
 {
-	m_game = NULL;
-	m_anims = NULL;
+	m_game = nullptr;
+	m_anims = nullptr;
 }
 
 CUIGameFMP::~CUIGameFMP()
@@ -155,10 +157,22 @@ bool CUIGameFMP::IR_UIOnKeyboardPress(int dik)
 
 	switch (get_binded_action(dik))
 	{
+	case kACTIVE_JOBS:
+		{
+			if (!psActorFlags.test(AF_3D_PDA) && !pActor->inventory_disabled())
+			{
+				ShowPdaMenu();
+			}
+			break;
+		}
 		case kINVENTORY:
 			{
 				if (!pActor->inventory_disabled())
-					ShowActorMenu();			
+				{
+					if (psActorFlags.test(AF_3D_PDA) && CurrentGameUI() && CurrentGameUI()->PdaMenu().IsShown())
+						pActor->inventory().Activate(NO_ACTIVE_SLOT);
+					ShowActorMenu();
+				}					
 			} break;
 
 		case kAnimationMode:

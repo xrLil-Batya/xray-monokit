@@ -65,7 +65,7 @@ CInventory::CInventory()
 		m_slots[i].m_bPersistent = !!pSettings->r_bool("inventory",temp);
 
 		xr_sprintf			(temp, "slot_active_%d", i);
-		m_slots[i].m_bAct	= !!pSettings->r_bool("inventory",temp);
+		m_slots[i].m_bAct	= pSettings->r_bool("inventory",temp);
 	};
 
 	m_bSlotsUseful								= true;
@@ -689,9 +689,9 @@ bool CInventory::Action(u16 cmd, u32 flags)
 	}
 
 	bool b_send_event = false;
-	if (cmd == kQUIT && pActor && ActiveItem() && ActiveItem() && ActiveItem()->cast_hud_item()) // "Hack" to make Esc key open main menu instead of simply hiding the PDA UI
+	if (cmd == kQUIT && pActor && ActiveItem() && psActorFlags.test(AF_3D_PDA)) // "Hack" to make Esc key open main menu instead of simply hiding the PDA UI
 	{
-		const auto pda = smart_cast<CPda*>(ActiveItem()->cast_hud_item());
+		const auto pda = smart_cast<CPda*>(ActiveItem());
 		if(pda && pda->GetState() != CPda::eHiding && pda->GetState() != CPda::eHidden)
 		{
 			b_send_event = true;
@@ -740,6 +740,7 @@ bool CInventory::Action(u16 cmd, u32 flags)
 			b_send_event = true;
 			if (flags & CMD_START)
 			{
+				if (!psActorFlags.test(AF_3D_PDA)) return false;
 				if (GetActiveSlot() == PDA_SLOT && ActiveItem())
 				{
 					Activate(NO_ACTIVE_SLOT);
