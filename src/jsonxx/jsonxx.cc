@@ -5,6 +5,7 @@
 //   Sean Middleditch <sean@middleditch.us>
 //   rlyeh <https://github.com/r-lyeh>
 
+#include "stdafx.h"
 #include "jsonxx.h"
 
 #include <cctype>

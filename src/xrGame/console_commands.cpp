@@ -1686,16 +1686,14 @@ public:
 	}
 };
 
+#include "game_cl_base.h"
 class CCC_InvUpgradesHierarchy : public IConsole_Command
 {
 public:
 	CCC_InvUpgradesHierarchy(LPCSTR N) : IConsole_Command(N)	{ bEmptyArgsHandled = TRUE; };
 	virtual void Execute( LPCSTR args )
 	{
-		if ( ai().get_alife() )
-		{
-			ai().alife().inventory_upgrade_manager().log_hierarchy();
-		}
+		Game().inventory_upgrade_manager().log_hierarchy();
 	}
 
 };
