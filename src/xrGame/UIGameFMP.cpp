@@ -159,7 +159,7 @@ bool CUIGameFMP::IR_UIOnKeyboardPress(int dik)
 	{
 	case kACTIVE_JOBS:
 		{
-			if (!psActorFlags.test(AF_3D_PDA) && !pActor->inventory_disabled())
+			if (!psDeviceFlags.test(AF_3D_PDA) && !pActor->inventory_disabled())
 			{
 				ShowPdaMenu();
 			}
@@ -169,7 +169,7 @@ bool CUIGameFMP::IR_UIOnKeyboardPress(int dik)
 			{
 				if (!pActor->inventory_disabled())
 				{
-					if (psActorFlags.test(AF_3D_PDA) && CurrentGameUI() && CurrentGameUI()->PdaMenu().IsShown())
+					if (psDeviceFlags.test(AF_3D_PDA) && CurrentGameUI() && CurrentGameUI()->PdaMenu().IsShown())
 						pActor->inventory().Activate(NO_ACTIVE_SLOT);
 					ShowActorMenu();
 				}					

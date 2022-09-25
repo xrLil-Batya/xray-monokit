@@ -258,7 +258,7 @@ void CPda::UpdateCL()
 	if (!ParentIsActor())
 		return;
 
-	if (!psActorFlags.test(AF_3D_PDA))
+	if (!psDeviceFlags.test(AF_3D_PDA))
 	{
 		if (GetState() != eHidden)
 			Actor()->inventory().Activate(NO_ACTIVE_SLOT);

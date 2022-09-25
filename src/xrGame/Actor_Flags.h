@@ -13,7 +13,6 @@ enum
 	AF_IMPORTANT_SAVE	=(1<<9),
 	AF_CROUCH_TOGGLE	=(1<<10),
 	AF_DISPLAY_VOICE_ICON = (1 << 11),
-	AF_3D_PDA = (1 << 12),
 };
 
 extern Flags32	psActorFlags;

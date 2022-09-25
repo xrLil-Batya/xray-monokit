@@ -534,7 +534,7 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
 	if (WINDOW_KEY_PRESSED == keyboard_action && IsShown())
 	{
-		if (!psActorFlags.test(AF_3D_PDA))
+		if (!psDeviceFlags.test(AF_3D_PDA))
 		{
 			EGameActions action = get_binded_action(dik);
 
