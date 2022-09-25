@@ -375,11 +375,12 @@ void CControlAnimationBase::FX_Play(EHitSide side, float amount)
 float CControlAnimationBase::GetAnimSpeed(EMotionAnim anim)
 {
 	SAnimItem *anim_it = m_anim_storage[anim];
-	VERIFY(anim_it);
+	R_ASSERT(anim_it);
 
 	CMotionDef			*def = get_motion_def(anim_it, 0);
+	R_ASSERT(def);
 
-	return				(def->Dequantize(def->speed));
+	return				(def->Speed());
 }
 
 

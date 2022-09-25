@@ -100,13 +100,13 @@ BOOL motions_value::load		(LPCSTR N, IReader *data, vecBones* bones)
 			PART.Name			= _strlwr(buf);
 			PART.bones.resize	(MP->r_u16());
 
-			for (xr_vector<u32>::iterator b_it=PART.bones.begin(); b_it<PART.bones.end(); b_it++)
+			for (auto& b_it : PART.bones)
 			{
 				MP->r_stringZ	(buf,sizeof(buf));
 				u16 m_idx 		= u16			(MP->r_u32());
-				*b_it			= find_bone_id	(bones,buf);
+				b_it			= find_bone_id	(bones,buf);
 #ifdef _EDITOR
-				if (*b_it==BI_NONE )
+				if (b_it==BI_NONE )
                 {
 					bRes		= false;
 					Msg			("!Can't find bone: '%s'", buf);
@@ -118,9 +118,9 @@ BOOL motions_value::load		(LPCSTR N, IReader *data, vecBones* bones)
 					Msg			("!Can't load: '%s' invalid bones count", N);
 				}
 #else
-				VERIFY3			(*b_it!=BI_NONE,"Can't find bone:", buf);
+				VERIFY3			(b_it!=BI_NONE,"Can't find bone:", buf);
 #endif
-				if (bRes)		rm_bones[m_idx] = u16(*b_it);
+				if (bRes)		rm_bones[m_idx] = u16(b_it);
 			}
 			part_bone_cnt		= u16(part_bone_cnt + (u16)PART.bones.size());
 		}
@@ -326,12 +326,30 @@ void CMotionDef::Load(IReader* MP, u32 fl, u16 version)
 	// params
 	bone_or_part= MP->r_u16(); // bCycle?part_id:bone_id;
 	motion		= MP->r_u16(); // motion_id
-	speed		= Quantize(MP->r_float());
-	power		= Quantize(MP->r_float());
-	accrue		= Quantize(MP->r_float());
-	falloff		= Quantize(MP->r_float());
-	flags		= (u16)fl;
-	if (!(flags&esmFX) && (falloff>=accrue)) falloff = u16(accrue-1);
+	speed = MP->r_float();
+	power = MP->r_float();
+	accrue = MP->r_float();
+	falloff = MP->r_float();
+	flags = static_cast<u16>(fl);
+	constexpr const float fQuantizerRangeExt = 1.5f; //Какое-то магическое число
+/*//Dbg
+	Log("############################################################################");
+	constexpr auto Dequantize = [](u16 V) { return  float(V) / 655.35f; };
+	auto Quantize = [](float V) { s32 t = iFloor(V * 655.35f); clamp(t, 0, 65535); return u16(t); };
+	Msg("!![%s] speed: [%f], power: [%f], accrue: [%f], fallof: [%f]", __FUNCTION__, Dequantize(Quantize(speed)), Dequantize(Quantize(power)), fQuantizerRangeExt * Dequantize(Quantize(accrue)), fQuantizerRangeExt * Dequantize(Quantize(falloff)));
+	Msg("--[%s] speed: [%f], power: [%f], accrue: [%f], fallof: [%f]", __FUNCTION__, speed, power, fQuantizerRangeExt * accrue, fQuantizerRangeExt * falloff);
+	if (!(flags & esmFX) && (Quantize(falloff) >= Quantize(accrue)))
+		Msg("!![%s] fallof set to [%f]", __FUNCTION__, fQuantizerRangeExt * Dequantize(u16(Quantize(accrue) - 1)));
+*/
+	if (!(flags & esmFX) && (falloff >= accrue)) {
+		falloff = accrue /* - 0.003f*/; //KRodin: 0.003f наиболее приближённо к тому что было до этого. Разница в результате буквально в тысячных долях. При Quantize/Dequantize точность в любом случае терялась, так что это не сильно важно.
+		if (/*negative(falloff)*/ negative(accrue - 0.003f))
+			falloff = 100.f; //И вообще это были какие-то костыли от ПЫС. Если при вычитании falloff становился меньше нуля (при том что он был unsigned!!!), то после Quantize/Dequantize всегда получалось 100.
+		//Msg("--[%s] fallof set to [%f]", __FUNCTION__, fQuantizerRangeExt * falloff);
+	}
+	//Log("############################################################################");
+	accrue *= fQuantizerRangeExt;
+	falloff *= fQuantizerRangeExt;
 
 	if(version>=4)
 	{
@@ -346,9 +364,9 @@ void CMotionDef::Load(IReader* MP, u32 fl, u16 version)
 	}
 }
 
-bool CMotionDef::StopAtEnd()
+bool CMotionDef::StopAtEnd() const
 {
-	return !!(flags&esmStopAtEnd);
+	return (flags&esmStopAtEnd);
 }
 
 bool shared_motions::create(shared_str key, IReader *data, vecBones* bones)

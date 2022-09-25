@@ -11,7 +11,7 @@ class CBlend;
 class IKinematics;
 
 // callback
-typedef void	( * PlayCallback)		(CBlend*		P);
+typedef void (*PlayCallback)(CBlend* P);
 
 
 //*** Key frame definition ************************************************************************
@@ -82,15 +82,15 @@ public:
 class ENGINE_API motion_marks
 {
 public:
-	typedef					std::pair<  float, float > 				interval;
+	using interval = std::pair<float, float>;
 #ifdef _EDITOR
 public:
 #else
 private:
 #endif
-	typedef xr_vector< interval >									STORAGE;
-	typedef STORAGE::iterator										ITERATOR;
-	typedef STORAGE::const_iterator									C_ITERATOR;
+	using STORAGE = xr_vector<interval>;
+	using ITERATOR = STORAGE::iterator;
+	using C_ITERATOR = STORAGE::const_iterator;
 
 	STORAGE			intervals;	
 public:
@@ -106,36 +106,28 @@ public:
 	float			time_to_next_mark	(float time) const;
 };
 
-
-const float	fQuantizerRangeExt	= 1.5f;
 class 	ENGINE_API	CMotionDef
 {
+	float speed{}, power{}, accrue{}, falloff{};
 public:
     u16						bone_or_part;
 	u16						motion;
-	u16						speed;				// quantized: 0..10
-	u16						power;				// quantized: 0..10
-	u16						accrue;				// quantized: 0..10
-	u16						falloff;			// quantized: 0..10
     u16						flags;
-	xr_vector<motion_marks>	marks;
-
-	IC float				Dequantize			(u16 V)	const	{	return  float(V)/655.35f; }
-	IC u16					Quantize			(float V) const		{	s32		t = iFloor(V*655.35f); clamp(t,0,65535); return u16(t); }
+	xr_vector<motion_marks> marks;
 
 	void					Load				(IReader* MP, u32 fl, u16 vers);
 	u32						mem_usage			(){ return sizeof(*this);}
 
-    ICF float				Accrue				(){return fQuantizerRangeExt*Dequantize(accrue);}
-    ICF float				Falloff				(){return fQuantizerRangeExt*Dequantize(falloff);}
-    ICF float				Speed				(){return Dequantize(speed);}
-    ICF float				Power				(){return Dequantize(power);}
-    bool					StopAtEnd			();
+	inline float Accrue() const { return accrue; }
+	inline float Falloff() const { return falloff; }
+	inline float Speed() const { return speed; }
+	inline float Power() const { return power; }
+	bool StopAtEnd() const;
 };
 struct accel_str_pred : public std::binary_function<shared_str, shared_str, bool>	{	
 	IC bool operator()(const shared_str& x, const shared_str& y) const	{	return xr_strcmp(x,y)<0;	}
 };
-typedef xr_map<shared_str,u16,accel_str_pred> 	accel_map;
+using accel_map = xr_map<shared_str,u16,accel_str_pred>;
 DEFINE_VECTOR			(CMotionDef,MotionDefVec,MotionDefVecIt);
 
 DEFINE_VECTOR			(CMotion,MotionVec,MotionVecIt);
@@ -147,7 +139,7 @@ class 	ENGINE_API	CPartDef
 {
 public:
 	shared_str			Name;
-	xr_vector<u32>		bones;
+	xr_vector<u32> bones;
 	CPartDef()			: Name(0) {};
 
 	u32					mem_usage			(){ return sizeof(*this)+bones.size()*sizeof(u32)+sizeof(Name);}
@@ -233,7 +225,6 @@ public:
 	accel_map*			cycle			()							{	VERIFY(p_); return &p_->m_cycle;				}
 	accel_map*			fx				()							{	VERIFY(p_); return &p_->m_fx;					}
 	CPartition*			partition		()							{	VERIFY(p_); return &p_->m_partition;			}
-    MotionDefVec*		motion_defs		()							{	VERIFY(p_); return &p_->m_mdefs;				}
     CMotionDef*			motion_def		(u16 idx)					{	VERIFY(p_); return &p_->m_mdefs[idx];			}
 
 	const shared_str	&id				() const					{	VERIFY(p_); return p_->m_id;					}
