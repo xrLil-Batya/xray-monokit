@@ -39,6 +39,16 @@ public:
 	void					updateWindowProps		(HWND hw);
 	BOOL					support					(D3DFORMAT fmt, DWORD type, DWORD usage);
 
+	inline const bool IsStaticRenderMode() const
+	{
+#if RENDER==R_R1
+		return true;
+#else
+		BOOL extern g_bStaticRender;
+		return g_bStaticRender;
+#endif
+	}
+
 #ifdef DEBUG
 #if defined(USE_DX10) || defined(USE_DX11)
 	void	Validate(void)	{};

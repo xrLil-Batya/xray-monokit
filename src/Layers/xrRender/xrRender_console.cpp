@@ -3,6 +3,7 @@
 
 #include	"xrRender_console.h"
 #include	"dxRenderDeviceRender.h"
+BOOL g_bStaticRender{};
 
 u32			ps_Preset				=	2	;
 xr_token							qpreset_token							[ ]={
@@ -654,6 +655,7 @@ void		xrRender_initconsole	()
 {
 	CMD3(CCC_Preset,	"_preset",				&ps_Preset,	qpreset_token	);
 
+    CMD4(CCC_Integer, "g_static_rendering", &g_bStaticRender, 0, 1);
 	CMD4(CCC_Integer,	"rs_skeleton_update",	&psSkeletonUpdate,	2,		128	);
 #ifdef	DEBUG
 	CMD1(CCC_DumpResources,		"dump_resources");
