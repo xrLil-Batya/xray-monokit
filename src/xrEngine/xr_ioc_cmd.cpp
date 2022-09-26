@@ -540,16 +540,21 @@ public:
 		tokens					= vid_quality_token;
 
 		inherited::Execute		(args);
-		//	0 - r1
-		//	1..3 - r2
-		//	4 - r3
-		psDeviceFlags.set		(rsR2, ((renderer_value>0) && renderer_value<4) );
-		psDeviceFlags.set		(rsR3, (renderer_value==4) );
-		psDeviceFlags.set		(rsR4, (renderer_value>=5) );
-
-		r2_sun_static	= (renderer_value<2);
-
-		r2_advanced_pp  = (renderer_value>=3);
+		//	0..2 - r1
+		//	3 - r4
+#ifdef DEDICATED_SERVER
+		psDeviceFlags.set(rsR2, false);
+		psDeviceFlags.set(rsR3, false);
+		psDeviceFlags.set(rsR4, false);
+		r2_sun_static = true;
+		r2_advanced_pp = false;
+#else
+		psDeviceFlags.set(rsR2, ((renderer_value >= 0) && renderer_value < 3));
+		psDeviceFlags.set(rsR4, !psDeviceFlags.test(rsR2));
+		psDeviceFlags.set(rsR3, psDeviceFlags.test(rsR4));
+		r2_sun_static = renderer_value == 0;
+		r2_advanced_pp = renderer_value >= 2;
+#endif
 	}
 
 	virtual void	Save	(IWriter *F)	
