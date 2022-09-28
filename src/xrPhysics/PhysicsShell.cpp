@@ -75,76 +75,72 @@ CPhysicsShell*	__stdcall P_build_Shell			( IPhysicsShellHolder* obj, bool not_ac
 	return pPhysicsShell;
 }
 
-void	fix_bones( LPCSTR	fixed_bones, CPhysicsShell* shell )
+void fix_bones(const char* fixed_bones, CPhysicsShell* shell)
 {
-		VERIFY(fixed_bones);
-		VERIFY(shell);
-		IKinematics	*pKinematics = shell->PKinematics();
-		VERIFY(pKinematics);
-		int count =					_GetItemCount(fixed_bones);
-		for (int i=0 ;i<count; ++i) 
-		{
-			string64					fixed_bone							;
-			_GetItem					(fixed_bones,i,fixed_bone)			;
-			u16 fixed_bone_id=pKinematics->LL_BoneID(fixed_bone)			;
-			R_ASSERT2(BI_NONE!=fixed_bone_id,"wrong fixed bone")			;
-			CPhysicsElement* E = shell->get_Element(fixed_bone_id)			;
-			if(E)
-				E->Fix();
-		}
+	VERIFY(fixed_bones && shell);
+	const auto pKinematics = shell->PKinematics();
+	VERIFY(pKinematics);
+	const unsigned int count = _GetItemCount(fixed_bones);
+	for (unsigned int i=0; i < count; ++i) 
+	{
+		string64 fixed_bone{};
+		_GetItem(fixed_bones, i, fixed_bone);
+		const unsigned short fixed_bone_id = pKinematics->LL_BoneID(fixed_bone);
+		R_ASSERT2(BI_NONE != fixed_bone_id, make_string("wrong fixed bone [%s] for object with sect [physics_common]", fixed_bone));
+		if(const auto E = shell->get_Element(fixed_bone_id))
+			E->Fix();
+	}
 }
-CPhysicsShell*	P_build_Shell( IPhysicsShellHolder* obj, bool not_active_state,BONE_P_MAP* p_bone_map, LPCSTR	fixed_bones )
+
+CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, const bool not_active_state, BONE_P_MAP* p_bone_map, const char* fixed_bones)
 {
-	CPhysicsShell* pPhysicsShell = 0;
+	CPhysicsShell* pPhysicsShell{};
 	//IKinematics* pKinematics=smart_cast<IKinematics*>(obj->ObjectVisual());
-	IKinematics* pKinematics=obj->ObjectKinematics();
+	const auto pKinematics = obj->ObjectKinematics();
 	if(fixed_bones)
 	{
-
-
-		int count =					_GetItemCount(fixed_bones);
-		for (int i=0 ;i<count; ++i) 
+		const unsigned int count = _GetItemCount(fixed_bones);
+		for (unsigned int i = 0; i < count; ++i) 
 		{
-			string64					fixed_bone							;
-			_GetItem					(fixed_bones,i,fixed_bone)			;
-			u16 fixed_bone_id=pKinematics->LL_BoneID(fixed_bone)			;
-			R_ASSERT2(BI_NONE!=fixed_bone_id,"wrong fixed bone")			;
-			p_bone_map->insert(mk_pair(fixed_bone_id,physicsBone()))			;
+			string64 fixed_bone{};
+			_GetItem(fixed_bones, i, fixed_bone);
+			const unsigned short fixed_bone_id = pKinematics->LL_BoneID(fixed_bone);
+			R_ASSERT2(BI_NONE != fixed_bone_id, make_string("wrong fixed bone [%s] for object [%s] with visual [%s]", fixed_bone, obj->ObjectName(), obj->ObjectNameVisual()));
+			p_bone_map->insert(mk_pair(fixed_bone_id,physicsBone()));
 		}
 
-		pPhysicsShell=P_build_Shell(obj,not_active_state,p_bone_map);
+		pPhysicsShell = P_build_Shell(obj,not_active_state,p_bone_map);
 
 		//m_pPhysicsShell->add_Joint(P_create_Joint(CPhysicsJoint::enumType::full_control,0,fixed_element));
 	}
 	else
 		pPhysicsShell=P_build_Shell(obj,not_active_state);
 
-
-	BONE_P_PAIR_IT i=p_bone_map->begin(),e=p_bone_map->end();
-	if(i!=e) pPhysicsShell->SetPrefereExactIntegration();
-	for(;i!=e;i++)
+	BONE_P_PAIR_IT i = p_bone_map->begin(), e = p_bone_map->end();
+	if(i != e)
+		pPhysicsShell->SetPrefereExactIntegration();
+	for(; i != e; i++)
 	{
-		CPhysicsElement* fixed_element=i->second.element;
-		R_ASSERT2(fixed_element,"fixed bone has no physics");
+		const auto fixed_element = i->second.element;
+		R_ASSERT2(fixed_element, "fixed bone has no physics");
 		//if(!fixed_element) continue;
 		fixed_element->Fix();
 	}
 	return pPhysicsShell;
 }
 
-CPhysicsShell*	P_build_Shell( IPhysicsShellHolder* obj, bool not_active_state, LPCSTR	fixed_bones )
+CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, const bool not_active_state, const char* fixed_bones)
 {
-	U16Vec f_bones;
-	if(fixed_bones){
-		//IKinematics* K		= smart_cast<IKinematics*>(obj->ObjectVisual());
-		IKinematics* K		=obj->ObjectKinematics();
-		VERIFY( K );
-		int count =			_GetItemCount(fixed_bones);
-		for (int i=0 ;i<count; ++i){
-			string64		fixed_bone;
-			_GetItem		(fixed_bones,i,fixed_bone);
+	U16Vec f_bones{};
+	if(fixed_bones) {
+		const auto K = obj->ObjectKinematics();
+		VERIFY(K);
+		const unsigned int count = _GetItemCount(fixed_bones);
+		for (unsigned int i = 0; i < count; ++i) {
+			string64 fixed_bone{};
+			_GetItem(fixed_bones, i, fixed_bone);
 			f_bones.push_back(K->LL_BoneID(fixed_bone));
-			R_ASSERT2(BI_NONE!=f_bones.back(),"wrong fixed bone")			;
+			R_ASSERT2(BI_NONE != f_bones.back(), make_string("wrong fixed bone [%s] for object [%s] with visual [%s]", fixed_bone, obj->ObjectName(), obj->ObjectNameVisual()));
 		}
 	}
 	return P_build_Shell	(obj,not_active_state,f_bones);
@@ -195,19 +191,19 @@ CPhysicsShell*	P_build_SimpleShell( IPhysicsShellHolder* obj, float mass, bool n
 	return pPhysicsShell;
 }
 
-void ApplySpawnIniToPhysicShell( CInifile const * ini, CPhysicsShell* physics_shell, bool fixed )
+void ApplySpawnIniToPhysicShell(CInifile const * ini, CPhysicsShell* physics_shell, bool fixed)
 {
 		if(!ini)
 			return;
 		if(ini->section_exist("physics_common"))
 		{
-			fixed = fixed || (ini->line_exist("physics_common","fixed_bones")) ;
+			fixed |= ini->line_exist("physics_common","fixed_bones");
 #pragma todo("not ignore static if non realy fixed! ")
-			fix_bones(ini->r_string("physics_common","fixed_bones"),physics_shell);
+			if(fixed)
+				fix_bones(ini->r_string("physics_common", "fixed_bones"), physics_shell);
 		}
 		if(ini->section_exist("collide"))
 		{
-
 			if((ini->line_exist("collide","ignore_static")&&fixed)||(ini->line_exist("collide","ignore_static")&&ini->section_exist("animated_object")))
 			{
 				physics_shell->SetIgnoreStatic();

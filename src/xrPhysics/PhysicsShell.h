@@ -422,15 +422,17 @@ XRPHYSICS_API	CPhysicsJoint*				P_create_Joint				(CPhysicsJoint::enumType type 
 XRPHYSICS_API	CPhysicsElement*			P_create_Element			()																											;
 XRPHYSICS_API	CPhysicsShell*				P_create_Shell				()																											;
 XRPHYSICS_API	CPhysicsShell*				P_create_splited_Shell		()																											;
-XRPHYSICS_API	CPhysicsShell*				P_build_Shell				(IPhysicsShellHolder* obj,bool not_active_state,LPCSTR	fixed_bones)												;
+
+XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, const bool not_active_state, const char* fixed_bones);
+XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, const bool not_active_state, BONE_P_MAP* bone_map, const char* fixed_bones);
+void XRPHYSICS_API fix_bones(const char* fixed_bones, CPhysicsShell* shell);
+
 XRPHYSICS_API	CPhysicsShell*				P_build_Shell				(IPhysicsShellHolder* obj,bool not_active_state,U16Vec& fixed_bones)												;
-XRPHYSICS_API	CPhysicsShell*				P_build_Shell				(IPhysicsShellHolder* obj,bool not_active_state,BONE_P_MAP* bone_map, LPCSTR fixed_bones)							;
 
 extern "C" XRPHYSICS_API	CPhysicsShell*		__stdcall		P_build_Shell				(IPhysicsShellHolder* obj,bool not_active_state,BONE_P_MAP* bone_map = 0, bool not_set_bone_callbacks = false)		;
 
 XRPHYSICS_API	CPhysicsShell*				P_build_SimpleShell			(IPhysicsShellHolder* obj,float mass,bool not_active_state)															;
 XRPHYSICS_API	void						ApplySpawnIniToPhysicShell	(CInifile const * ini,CPhysicsShell* physics_shell,bool fixed)														;
-				void						fix_bones					(LPCSTR	fixed_bones,CPhysicsShell* shell )																	;
 
 extern "C" XRPHYSICS_API	void	__stdcall			destroy_physics_shell		(CPhysicsShell* &p)																							;
 

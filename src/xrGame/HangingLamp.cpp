@@ -336,33 +336,30 @@ void	CHangingLamp::Hit					(SHit* pHDS)
 }
 
 static BONE_P_MAP bone_map=BONE_P_MAP();
-void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp	*lamp)
+void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
 {
-	if (!Visual())			return;
-	if (m_pPhysicsShell)	return;
-	
-	IKinematics* pKinematics= smart_cast<IKinematics*>	(Visual());
+	if (!Visual() || m_pPhysicsShell)
+		return;
 
-	m_pPhysicsShell			= P_create_Shell();
-
-	bone_map					.clear();
-	LPCSTR	fixed_bones=*lamp->fixed_bones;
-	if(fixed_bones){
-		int count =					_GetItemCount(fixed_bones);
-		for (int i=0 ;i<count; ++i){
-			string64					fixed_bone							;
-			_GetItem					(fixed_bones,i,fixed_bone)			;
-			u16 fixed_bone_id=pKinematics->LL_BoneID(fixed_bone)			;
-			R_ASSERT2(BI_NONE!=fixed_bone_id,"wrong fixed bone")			;
-			bone_map.insert(mk_pair(fixed_bone_id,physicsBone()))			;
+	const auto pKinematics = smart_cast<IKinematics*>(Visual());
+	m_pPhysicsShell = P_create_Shell();
+	bone_map.clear();
+	const char* fixed_bones = *lamp->fixed_bones;
+	if(fixed_bones) {
+		const unsigned int count = _GetItemCount(fixed_bones);
+		for (unsigned int i = 0; i < count; ++i) {
+			string64 fixed_bone{};
+			_GetItem(fixed_bones, i, fixed_bone);
+			const unsigned short fixed_bone_id = pKinematics->LL_BoneID(fixed_bone);
+			R_ASSERT2(BI_NONE != fixed_bone_id, make_string("wrong fixed bone [%s] for object with section [%s]", fixed_bone, *cNameSect()));
+			bone_map.insert(mk_pair(fixed_bone_id, physicsBone()));
 		}
-	}else{
-		bone_map.insert(mk_pair(pKinematics->LL_GetBoneRoot(),physicsBone()))			;
 	}
+	else
+		bone_map.insert(mk_pair(pKinematics->LL_GetBoneRoot(), physicsBone()));
 
-	phys_shell_verify_object_model ( *this );
-	
-	m_pPhysicsShell->build_FromKinematics(pKinematics,&bone_map);
+	phys_shell_verify_object_model(*this);
+	m_pPhysicsShell->build_FromKinematics(pKinematics, &bone_map);
 	m_pPhysicsShell->set_PhysicsRefObject(this);
 	m_pPhysicsShell->mXFORM.set(XFORM());
 	m_pPhysicsShell->Activate(true);//,
@@ -371,18 +368,18 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp	*lamp)
 
 /////////////////////////////////////////////////////////////////////////////
 	BONE_P_PAIR_IT i=bone_map.begin(),e=bone_map.end();
-	for(;i!=e;i++){
-		CPhysicsElement* fixed_element=i->second.element;
+	for(; i != e; i++) {
 		///R_ASSERT2(fixed_element,"fixed bone has no physics");
-		if(fixed_element)fixed_element->Fix();
+		if(const auto fixed_element = i->second.element)
+			fixed_element->Fix();
 	}
 
 	m_pPhysicsShell->mXFORM.set(XFORM());
 	m_pPhysicsShell->SetAirResistance(0.001f, 0.02f);
-	SAllDDOParams disable_params;
+	SAllDDOParams disable_params{};
 	disable_params.Load(smart_cast<IKinematics*>(Visual())->LL_UserData());
 	m_pPhysicsShell->set_DisableParams(disable_params);
-	ApplySpawnIniToPhysicShell(&lamp->spawn_ini(),m_pPhysicsShell,fixed_bones[0]!='\0');
+	ApplySpawnIniToPhysicShell(&lamp->spawn_ini(), m_pPhysicsShell, fixed_bones[0] != '\0');
 }
 
 void CHangingLamp::net_Export(NET_Packet& P)
