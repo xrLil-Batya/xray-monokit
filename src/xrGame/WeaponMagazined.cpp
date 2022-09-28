@@ -1305,12 +1305,10 @@ void	CWeaponMagazined::OnPrevFireMode		()
 
 void	CWeaponMagazined::OnH_A_Chield		()
 {
-	if (m_bHasDifferentFireModes)
-	{
-		CActor	*actor = smart_cast<CActor*>(H_Parent());
-		if (!actor) SetQueueSize(-1);
-		else SetQueueSize(GetCurrentFireMode());
-	};	
+	if (m_bHasDifferentFireModes && !smart_cast<CActor*>(H_Parent()))
+		SetQueueSize(-1);
+    else
+		SetQueueSize(GetCurrentFireMode());
 	inherited::OnH_A_Chield();
 };
 
