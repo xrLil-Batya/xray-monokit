@@ -264,21 +264,20 @@ void					CRender::create					()
 	}
 
 	// options
-	o.bug				= (strstr(Core.Params,"-bug"))?			TRUE	:FALSE	;
-	o.sunfilter			= (strstr(Core.Params,"-sunfilter"))?	TRUE	:FALSE	;
-	//.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
-	o.sunstatic			= r2_sun_static || HW.IsStaticRenderMode();
-	o.advancedpp		= r2_advanced_pp;
-	o.volumetricfog		= ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
-	o.sjitter			= (strstr(Core.Params,"-sjitter"))?		TRUE	:FALSE	;
-	o.depth16			= (strstr(Core.Params,"-depth16"))?		TRUE	:FALSE	;
-	o.noshadows			= (strstr(Core.Params,"-noshadows"))?	TRUE	:FALSE	;
-	o.Tshadows			= (strstr(Core.Params,"-tsh"))?			TRUE	:FALSE	;
-	o.mblur				= (strstr(Core.Params,"-mblur"))?		TRUE	:FALSE	;
-	o.distortion_enabled= (strstr(Core.Params,"-nodistort"))?	FALSE	:TRUE	;
-	o.distortion		= o.distortion_enabled;
-	o.disasm			= (strstr(Core.Params,"-disasm"))?		TRUE	:FALSE	;
-	o.forceskinw		= (strstr(Core.Params,"-skinw"))?		TRUE	:FALSE	;
+	o.bug = (strstr(Core.Params,"-bug")) ? true : false;
+	o.sunfilter = (strstr(Core.Params,"-sunfilter")) ? true : false;
+	o.sunstatic = r2_sun_static || HW.IsStaticRenderMode();
+	o.advancedpp = r2_advanced_pp && !HW.IsStaticRenderMode();
+	o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
+	o.sjitter = (strstr(Core.Params,"-sjitter")) ? true : false;
+	o.depth16 = (strstr(Core.Params,"-depth16")) ? true : false;
+	o.noshadows = (strstr(Core.Params,"-noshadows")) ? true : false;
+	o.Tshadows = (strstr(Core.Params,"-tsh")) ? true : false;
+	o.mblur = (strstr(Core.Params,"-mblur")) ? true : false;
+	o.distortion_enabled = (strstr(Core.Params,"-nodistort")) ? false : true;
+	o.distortion = o.distortion_enabled;
+	o.disasm = (strstr(Core.Params,"-disasm")) ? true : false;
+	o.forceskinw = (strstr(Core.Params,"-skinw")) ? true : false;
 
 	o.ssao_blur_on		= ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
 	o.ssao_opt_data		= ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
