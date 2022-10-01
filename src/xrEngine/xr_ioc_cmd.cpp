@@ -552,8 +552,8 @@ public:
 		psDeviceFlags.set(rsR2, ((renderer_value >= 0) && renderer_value < 3));
 		psDeviceFlags.set(rsR4, !psDeviceFlags.test(rsR2));
 		psDeviceFlags.set(rsR3, psDeviceFlags.test(rsR4));
-		r2_sun_static = renderer_value == 0;
-		r2_advanced_pp = renderer_value >= 2;
+		r2_sun_static = false;
+		r2_advanced_pp = true;
 #endif
 	}
 
