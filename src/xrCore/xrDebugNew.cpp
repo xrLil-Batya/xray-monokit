@@ -750,17 +750,11 @@ LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
 	}
 #endif // USE_BUG_TRAP
 
-	static void handler_base				(LPCSTR reason_string)
+	static void handler_base(const char* reason_string)
 	{
-		bool							ignore_always = false;
-		Debug.backend					(
-			"error handler is invoked!",
-			reason_string,
-			0,
-			0,
-			DEBUG_INFO,
-			ignore_always
-		);
+		constexpr const bool ignore_always = true;
+		if(!ignore_always)
+			Debug.backend("error handler is invoked!", reason_string, 0, 0, DEBUG_INFO, ignore_always);
 	}
 
 	static void invalid_parameter_handler	(

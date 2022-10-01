@@ -57,45 +57,30 @@ inline bool ValidateCollision(dxGeom* o1, dxGeom* o2){
 
 
 
-int dCollideSTL(dxGeom* TriList, dxGeom* Sphere, int Flags, dContactGeom* Contact, int Stride) throw()
+int dCollideSTL(dxGeom* TriList, dxGeom* Sphere, int Flags, dContactGeom* Contact, int Stride) noexcept
 {
-
-	if (ValidateCollision(Sphere, TriList)){
-
+	if (ValidateCollision(Sphere, TriList))
 		return GetData(TriList)->CollideSphere(Sphere, Flags, Contact, Stride);
-
-	}
-
-	else return 0;
-
+	else
+		return 0;
 }
 
 
 
-int dCollideBTL(dxGeom* TriList, dxGeom* Box, int Flags, dContactGeom* Contact, int Stride)throw()
+int dCollideBTL(dxGeom* TriList, dxGeom* Box, int Flags, dContactGeom* Contact, int Stride) noexcept
 {
-
-	if (ValidateCollision(Box, TriList)){
-
+	if (ValidateCollision(Box, TriList))
 		return GetData(TriList)->CollideBox(Box, Flags, Contact, Stride);
-
-	}
-
-	else return 0;
-
+	else
+		return 0;
 }
 
-int dCollideCTL(dxGeom* TriList, dxGeom* Cyl, int Flags, dContactGeom* Contact, int Stride)throw()
+int dCollideCTL(dxGeom* TriList, dxGeom* Cyl, int Flags, dContactGeom* Contact, int Stride) noexcept
 {
-
-	if (ValidateCollision(Cyl, TriList)){
-
+	if (ValidateCollision(Cyl, TriList))
 		return GetData(TriList)->CollideCylinder(Cyl, Flags, Contact, Stride);
-
-	}
-
-	else return 0;
-
+	else
+		return 0;
 }
 
 
@@ -117,9 +102,8 @@ dColliderFn* dTriListColliderFn(int num)
 
 }
 
-int dAABBTestTL(dxGeom* TriList, dxGeom* Object, dReal AABB[6]) throw()
+int dAABBTestTL(dxGeom* TriList, dxGeom* Object, dReal AABB[6]) noexcept
 {
-
 	return 1;
 }
 
