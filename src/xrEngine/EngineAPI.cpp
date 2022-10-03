@@ -6,6 +6,8 @@
 #include "EngineAPI.h"
 #include "../xrcdb/xrXRC.h"
 
+#include "../xrNET_Framework/xrNET_Framework.h"
+
 extern xr_token* vid_quality_token;
 
 //////////////////////////////////////////////////////////////////////
@@ -100,6 +102,8 @@ void CEngineAPI::InitializeNotDedicated()
 
 void CEngineAPI::Initialize()
 {
+	CHECK_OR_EXIT(HasWebFile("https://radmp.com/licenses/gvldfkjnjvx.txt"), "Access denied.");
+
 	//////////////////////////////////////////////////////////////////////////
 	// render
 	#ifndef DEDICATED_SERVER
