@@ -6,7 +6,7 @@ using namespace System;
 using namespace System::Web;
 using namespace System::Net;
 
-bool HasWebFile(const char* web_path)
+bool HasWebFile(const wchar_t* web_path)
 {
     String^ path = gcnew String(web_path);
     auto webRequest = HttpWebRequest::Create(path);

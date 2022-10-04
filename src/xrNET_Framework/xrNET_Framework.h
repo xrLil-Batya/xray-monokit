@@ -6,4 +6,4 @@
 #define XRNETFRAMEWORK_API _declspec(dllimport)
 #endif
 
-XRNETFRAMEWORK_API bool HasWebFile(const char* web_path);
+XRNETFRAMEWORK_API bool HasWebFile(const wchar_t* web_path);

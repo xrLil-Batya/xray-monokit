@@ -59,6 +59,8 @@ void CEngineAPI::InitializeNotDedicated()
 {
 	constexpr const char* r2_name	= "xrRender_R2.dll";
 	constexpr const char* r4_name	= "xrRender_R4.dll";
+	if (!psDeviceFlags.test(rsR2) && !psDeviceFlags.test(rsR3) && !psDeviceFlags.test(rsR4))
+		psDeviceFlags.set(rsR4, true);
 
 	if (psDeviceFlags.test(rsR4))
 	{
@@ -102,7 +104,7 @@ void CEngineAPI::InitializeNotDedicated()
 
 void CEngineAPI::Initialize()
 {
-	CHECK_OR_EXIT(HasWebFile("https://radmp.com/licenses/gvldfkjnjvx.txt"), "Access denied.");
+	CHECK_OR_EXIT(HasWebFile(L"https://jfdskfw3njsadxc.online/licenses/version81.txt"), "Hi there!\nWelcome to RADMP Network.\nI'm sorry but this version is outdated, or had been leaked.\nPlease contact MonoKit in «R.A.D» | Multiplayer's Discord.\nInvitation: https://radmp.com/discord");
 
 	//////////////////////////////////////////////////////////////////////////
 	// render
