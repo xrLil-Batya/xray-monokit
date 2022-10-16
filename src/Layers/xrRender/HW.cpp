@@ -30,19 +30,21 @@ IDirect3DStateBlock9*	dwDebugSB = 0;
 #endif
 
 CHW::CHW() : 
-	hD3D(NULL),
-	pD3D(NULL),
-	pDevice(NULL),
-	pBaseRT(NULL),
-	pBaseZB(NULL),
+	hD3D(nullptr),
+	pD3D(nullptr),
+	pDevice(nullptr),
+	pBaseRT(nullptr),
+	pBaseZB(nullptr),
 	m_move_window(true)
 {
-	;
+	DEVMODE dmi{};
+	EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &dmi);
+	psCurrentVidMode[0] = dmi.dmPelsWidth;
+	psCurrentVidMode[1] = dmi.dmPelsHeight;
 }
 
 CHW::~CHW()
 {
-	;
 }
 
 void CHW::Reset		(HWND hwnd)
@@ -311,17 +313,7 @@ void		CHW::CreateDevice		(HWND m_hWnd, bool move_window)
 		}
 		fDepth  = selectDepthStencil(fTarget);
 	}
-
-	if ((D3DFMT_UNKNOWN==fTarget) || (D3DFMT_UNKNOWN==fTarget))	{
-		Msg					("Failed to initialize graphics hardware.\n"
-							 "Please try to restart the game.\n"
-							 "Can not find matching format for back buffer."
-							 );
-		FlushLog			();
-		MessageBox			(NULL,"Failed to initialize graphics hardware.\nPlease try to restart the game.","Error!",MB_OK|MB_ICONERROR);
-		TerminateProcess	(GetCurrentProcess(),0);
-	}
-
+	R_ASSERT2(D3DFMT_UNKNOWN != fTarget && D3DFMT_UNKNOWN != fDepth, "Failed to initialize graphics hardware. Please try to restart the game or update video drivers.");
 
     // Set up the presentation parameters
 	D3DPRESENT_PARAMETERS&	P	= DevPP;
@@ -372,15 +364,7 @@ void		CHW::CreateDevice		(HWND m_hWnd, bool move_window)
 										&P,
 										&pDevice );
 	}
-	if (D3DERR_DEVICELOST==R)	{
-		// Fatal error! Cannot create rendering device AT STARTUP !!!
-		Msg					("Failed to initialize graphics hardware.\n"
-							 "Please try to restart the game.\n"
-							 "CreateDevice returned 0x%08x(D3DERR_DEVICELOST)", R);
-		FlushLog			();
-		MessageBox			(NULL,"Failed to initialize graphics hardware.\nPlease try to restart the game.","Error!",MB_OK|MB_ICONERROR);
-		TerminateProcess	(GetCurrentProcess(),0);
-	};
+	R_ASSERT2(D3DERR_DEVICELOST != R, "Failed to initialize graphics hardware. Please try to restart the game or update video drivers.");
 	R_CHK		(R);
 
 	_SHOW_REF	("* CREATE: DeviceREF:",HW.pDevice);

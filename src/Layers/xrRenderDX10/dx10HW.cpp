@@ -40,13 +40,18 @@ CHW::CHW() :
 //	hD3D(NULL),
 	//pD3D(NULL),
 	m_pAdapter(0),
-	pDevice(NULL),
+	pDevice(nullptr),
 	m_move_window(true)
 	//pBaseRT(NULL),
 	//pBaseZB(NULL)
 {
 	Device.seqAppActivate.Add(this);
 	Device.seqAppDeactivate.Add(this);
+
+	DEVMODE dmi{};
+	EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &dmi);
+	psCurrentVidMode[0] = dmi.dmPelsWidth;
+	psCurrentVidMode[1] = dmi.dmPelsHeight;
 }
 
 CHW::~CHW()
@@ -378,17 +383,7 @@ void CHW::CreateDevice( HWND m_hWnd, bool move_window )
 	}
 	*/
 	//if (D3DERR_DEVICELOST==R)	{
-	if (FAILED(R))
-	{
-		// Fatal error! Cannot create rendering device AT STARTUP !!!
-		Msg					("Failed to initialize graphics hardware.\n"
-							 "Please try to restart the game.\n"
-							 "CreateDevice returned 0x%08x", R
-							 );
-		FlushLog			();
-		MessageBox			(NULL,"Failed to initialize graphics hardware.\nPlease try to restart the game.","Error!",MB_OK|MB_ICONERROR);
-		TerminateProcess	(GetCurrentProcess(),0);
-	};
+	R_ASSERT2(SUCCEEDED(R), "Failed to initialize graphics hardware. Please try to restart the game or update video drivers.");
 	R_CHK(R);
 
 	_SHOW_REF	("* CREATE: DeviceREF:",HW.pDevice);
