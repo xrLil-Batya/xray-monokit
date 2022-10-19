@@ -914,20 +914,6 @@ void show_indicators();
 CActorDeathEffector::CActorDeathEffector	(CActorCondition* parent, LPCSTR sect)	// -((
 :m_pParent(parent)
 {
-	Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL,true);
-	hide_indicators			();
-
-	AddEffector				(Actor(), effActorDeath, sect);
-	disable_input			();
-	LPCSTR snd				= pSettings->r_string(sect, "snd");
-	m_death_sound.create	(snd,st_Effect,0);
-	m_death_sound.play_at_pos(0,Fvector().set(0,0,0),sm_2D);
-
-
-	SBaseEffector* pe		= Actor()->Cameras().GetPPEffector((EEffectorPPType)effActorDeath);
-	pe->m_on_b_remove_callback = SBaseEffector::CB_ON_B_REMOVE(this, &CActorDeathEffector::OnPPEffectorReleased);
-	m_b_actual				= true;	
-	m_start_health			= m_pParent->health();
 }
 
 CActorDeathEffector::~CActorDeathEffector()
@@ -935,21 +921,12 @@ CActorDeathEffector::~CActorDeathEffector()
 
 void CActorDeathEffector::UpdateCL()
 {
-	m_pParent->SetHealth( m_start_health );
 }
 
 void CActorDeathEffector::OnPPEffectorReleased()
 {
-	m_b_actual				= false;	
-	Msg("111");
-	//m_pParent->health()		= -1.0f;
-	m_pParent->SetHealth		(-1.0f);
 }
 
 void CActorDeathEffector::Stop()
 {
-	RemoveEffector			(Actor(),effActorDeath);
-	m_death_sound.destroy	();
-	enable_input			();
-	show_indicators			();
 }
