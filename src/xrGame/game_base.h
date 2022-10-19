@@ -45,6 +45,7 @@ struct game_PlayerState
 	s16			m_iDeaths;
 	//money that player have at the current moment
 	s32			money_for_round;
+	std::vector<const char*> _info_portions{};
 
 	float		experience_Real;
 	float		experience_New;

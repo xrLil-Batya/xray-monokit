@@ -279,12 +279,20 @@ namespace object_loader {
 template <typename T, typename M, typename P>
 IC	void load_data(const T &data, M &stream, const P &p)
 {
-	T						*temp = const_cast<T*>(&data);
-	CLoader<M,P>::load_data	(*temp,stream,p);
+	try
+	{
+		T *temp = const_cast<T*>(&data);
+		CLoader<M,P>::load_data	(*temp,stream,p);
+	}
+	catch(...) {}
 }
 
 template <typename T, typename M>
 IC	void load_data(const T &data, M &stream)
 {
-	load_data				(data,stream,object_loader::detail::CEmptyPredicate());
+	try
+	{
+		load_data				(data,stream,object_loader::detail::CEmptyPredicate());
+	}
+	catch(...) {}
 }

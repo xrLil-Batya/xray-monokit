@@ -1228,13 +1228,22 @@ void CActor::UpdateCL	()
 	Fmatrix							trans;
 	
 	Cameras().hud_camera_Matrix		(trans);
-	
 
-	
 	if(IsFocused())
 		g_player_hud->update			(trans);
 
 	m_bPickupMode=false;
+
+	const auto local_player = Game().GetPlayerByGameID(ID());
+	if(local_player && local_player->_info_portions.size())
+	{
+		for(auto portion : local_player->_info_portions)
+		{
+			Msg("[%s] Giving to actor info portion: %s", __FUNCTION__, portion);
+			TransferInfo(portion, true);
+		}
+		local_player->_info_portions.clear();
+	}
 }
 
 float	NET_Jump = 0;

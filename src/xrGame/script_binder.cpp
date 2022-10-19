@@ -98,7 +98,12 @@ void CScriptBinder::reload			(LPCSTR section)
 		lua_function		(game_object ? game_object->lua_game_object() : 0);
 	}
 	catch(...) {
-		R_ASSERT3(0, "Script binder crashed during getting lua game object", m_object->m_object->Name());
+		if(m_object && m_object->m_object)
+			R_ASSERT3(false, "Script binder crashed during getting lua game object", m_object->m_object->Name());
+		else if(game_object)
+			R_ASSERT3(false, "Script binder crashed during getting lua game object, this section: ", *game_object->cNameSect());
+		else
+			R_ASSERT2(false, "Script binder crashed during getting lua game object");
 		clear				();
 		return;
 	}

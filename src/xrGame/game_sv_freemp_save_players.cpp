@@ -10,7 +10,8 @@
 #include "..\jsonxx\jsonxx.h"
 #include <fstream>
 #include <iostream>
-
+#include "infoportion.h"
+#include "alife_registry_wrappers.h"
 
 bool game_sv_freemp::HasSaveFile(game_PlayerState* ps)
 {
@@ -124,11 +125,22 @@ void game_sv_freemp::SavePlayer(game_PlayerState* ps, CInifile* file)
 		file->w_u32("actor", "items_count", id);
 		file->w_u32("actor", "money", ps->money_for_round);
 		file->w_u8("actor", "team", ps->team);
+
+		const auto portions = actor->m_known_info_registry->registry().objects();
+		file->w_u32("actor", "portion_count", portions.size());
+		for(u32 i = 0; i < portions.size(); i++)
+		{
+			string64 portion{};
+			strconcat(sizeof(portion), portion, "info_portion_", std::to_string(i).c_str());
+			file->w_string("actor", portion, *portions[i]);
+		}
 	}
 }
 
 bool game_sv_freemp::LoadPlayer(game_PlayerState* ps, CInifile* file)
 {
+	CObject* obj = Level().Objects.net_Find(ps->GameID);
+	CInventoryOwner* actor = smart_cast<CInventoryOwner*>(obj);
 	if (file->section_exist("actor"))
 	{
 		u32 count = 0;
@@ -141,6 +153,16 @@ bool game_sv_freemp::LoadPlayer(game_PlayerState* ps, CInifile* file)
 
 		//if (file->line_exist("actor", "team"))
 		//	ps->team = file->r_u32("actor", "team");
+		const u32 portions_size = READ_IF_EXISTS(file, r_u32, "actor", "portion_count", 0);
+		for(u32 i = 0; i < portions_size; i++)
+		{
+			string64 portion{};
+			strconcat(sizeof(portion), portion, "info_portion_", std::to_string(i).c_str());
+			const char* _portion = file->r_string("actor", portion);
+
+			Msg("[%s] Giving to actor info portion: %s", __FUNCTION__, _portion);
+			ps->_info_portions.push_back(_portion);
+		}
 
 		SpawnItemToActor(ps->GameID, "device_pda");
 		SpawnItemToActor(ps->GameID, "device_torch");
@@ -227,11 +249,10 @@ bool game_sv_freemp::LoadPlayer(game_PlayerState* ps, CInifile* file)
 					}
 				}
 
-
 				spawn_end(E, m_server->GetServerClient()->ID);
 			}
 		}
-		 
+
 		return true;
 	}
 	else

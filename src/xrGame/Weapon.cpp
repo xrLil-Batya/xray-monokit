@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Weapon.h"
+#include "WeaponMagazinedWGrenade.h"
 #include "ParticlesObject.h"
 #include "entity_alive.h"
 #include "inventory_item_impl.h"
@@ -1797,40 +1797,25 @@ void CWeapon::UpdateHudAdditonal(Fmatrix& trans)
 	u8 idx = GetCurrentHudOffsetIdx();
 	const bool b_aiming = idx == 1;
 
+	const auto hi = HudItemData();
+	R_ASSERT(hi);
+	Fvector zr_offs = hi->m_measures.m_hands_offset[0][idx], zr_rot = hi->m_measures.m_hands_offset[1][idx];
 	Fvector curr_offs{}, curr_rot{};
 	if(b_aiming)
 	{
 //		if(idx==0)					return;
-
-		attachable_hud_item*		hi = HudItemData();
-		R_ASSERT					(hi);
-		curr_offs					= hi->m_measures.m_hands_offset[0][idx];//pos,aim
-		curr_rot					= hi->m_measures.m_hands_offset[1][idx];//rot,aim
-		curr_offs.mul				(m_zoom_params.m_fZoomRotationFactor);
-		curr_rot.mul				(m_zoom_params.m_fZoomRotationFactor);
-
-		Fmatrix						hud_rotation;
-		hud_rotation.identity		();
-		hud_rotation.rotateX		(curr_rot.x);
-
-		Fmatrix						hud_rotation_y;
-		hud_rotation_y.identity		();
-		hud_rotation_y.rotateY		(curr_rot.y);
-		hud_rotation.mulA_43		(hud_rotation_y);
-
-		hud_rotation_y.identity		();
-		hud_rotation_y.rotateZ		(curr_rot.z);
-		hud_rotation.mulA_43		(hud_rotation_y);
-
-		hud_rotation.translate_over	(curr_offs);
-		trans.mulB_43				(hud_rotation);
 
 		if(pActor->IsZoomAimingMode())
 			m_zoom_params.m_fZoomRotationFactor += Device.fTimeDelta/m_zoom_params.m_fZoomRotateTime;
 		else
 			m_zoom_params.m_fZoomRotationFactor -= Device.fTimeDelta/m_zoom_params.m_fZoomRotateTime;
 
-		clamp(m_zoom_params.m_fZoomRotationFactor, 0.f, 1.f);
+        clamp(m_zoom_params.m_fZoomRotationFactor, 0.f, 1.f);
+
+        zr_offs.mul(m_zoom_params.m_fZoomRotationFactor);
+        zr_rot.mul(m_zoom_params.m_fZoomRotationFactor);
+
+        summary_offset.add(zr_offs);
 	}
 	
 JUMP_EFFECT:
@@ -2001,15 +1986,15 @@ APPLY_EFFECTS:
 
 		if (b_aiming)
 		{
-			hud_rotation.rotateX(curr_offs.x);
+			hud_rotation.rotateX(zr_rot.x);
 
 			Fmatrix hud_rotation_y;
 			hud_rotation_y.identity();
-			hud_rotation_y.rotateY(curr_offs.y);
+			hud_rotation_y.rotateY(zr_rot.y);
 			hud_rotation.mulA_43(hud_rotation_y);
 
 			hud_rotation_y.identity();
-			hud_rotation_y.rotateZ(curr_offs.z);
+			hud_rotation_y.rotateZ(zr_rot.z);
 			hud_rotation.mulA_43(hud_rotation_y);
 			//Msg("~~[%s] zr_rot: [%f,%f,%f]", __FUNCTION__, zr_rot.x, zr_rot.y, zr_rot.z);
 		}
@@ -2211,6 +2196,12 @@ void CWeapon::OnAnimationEnd(u32 state)
 
 u8 CWeapon::GetCurrentHudOffsetIdx()
 {
+	if(const auto wpn_w_gl = smart_cast<CWeaponMagazinedWGrenade*>(this))
+	{
+		if(wpn_w_gl->m_bGrenadeMode)
+			return 2;
+	}
+
 	const bool b_aiming = ((IsZoomed() && m_zoom_params.m_fZoomRotationFactor <= 1.f) || (!IsZoomed() && m_zoom_params.m_fZoomRotationFactor > 0.f));
 	return	b_aiming;
 }
