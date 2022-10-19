@@ -161,7 +161,7 @@ void CUIMessagesWindow::Show(bool show)
 
 void CUIMessagesWindow::Draw()
 {
-	const bool IsPDAShown = CurrentGameUI() && CurrentGameUI()->PdaMenu().IsShown() && CurrentGameUI()->PdaMenu().m_pActiveDialog == this;
+	const bool IsPDAShown = true; //CurrentGameUI() && CurrentGameUI()->PdaMenu().IsShown() && CurrentGameUI()->PdaMenu().m_pActiveDialog == this;
 	if (!IsPDAShown || Device.dwFrame == dwMessagesFrame)
 		return;
 

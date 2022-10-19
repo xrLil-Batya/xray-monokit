@@ -9,6 +9,8 @@
 #include "../game_cl_base.h"
 #include "../xr_level_controller.h"
 #include "../Level.h"
+#include "UIGameCustom.h"
+#include "ui/UIPdaWnd.h"
 
 CUIChatWnd::CUIChatWnd()
 	:	sendNextMessageToAll	(true)
@@ -34,9 +36,8 @@ void CUIChatWnd::PendingMode(bool const is_pending_mode)
 	pendingGameMode				= false;
 }
 
-#define CHAT_PREFIX_PENDING		"chat_prefix_pending"
-#define CHAT_EDITBOX_PENDING	"chat_editbox_pending"
-
+constexpr const char* CHAT_PREFIX_PENDING = "chat_prefix_pending";
+constexpr const char* CHAT_EDITBOX_PENDING = "chat_editbox_pending";
 void CUIChatWnd::Init(CUIXml& uiXml)
 {
 	UIPrefix					= UIHelper::CreateTextWnd(uiXml, "chat_prefix", this);
@@ -93,11 +94,19 @@ void CUIChatWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUIChatWnd::OnChatCommit(CUIWindow* w, void* d)
 {
-	Game().ChatSay				(UIEditBox->GetText(), sendNextMessageToAll);
-	UIEditBox->ClearText		();
-	UIEditBox->CaptureFocus(true);
+	Game().ChatSay(UIEditBox->GetText(), sendNextMessageToAll);
+
+	if(CurrentGameUI() && CurrentGameUI()->PdaMenu().IsShown())
+	{
+		UIEditBox->ClearText();
+		UIEditBox->CaptureFocus(true);
+	}
+	else
+		HideDialog();
 }
 
 void CUIChatWnd::OnChatCancel(CUIWindow* w, void* d)
 {
+	if(!(CurrentGameUI() && CurrentGameUI()->PdaMenu().IsShown()))
+		HideDialog();
 }
