@@ -126,8 +126,9 @@ const u32 &CPatrolPoint::level_vertex_id					() const
 
 const GameGraph::_GRAPH_ID &CPatrolPoint::game_vertex_id	() const
 {
-	CGameGraph::CVertex const*	vertex = ai().game_graph().vertex(m_game_vertex_id);
-	VERIFY2				(
+	const bool has_vertex = &ai() && &ai().game_graph();
+	const CGameGraph::CVertex* vertex = has_vertex ? ai().game_graph().vertex(m_game_vertex_id) : nullptr;
+	VERIFY2(
 		vertex,
 		make_string(
 			"invalid game vertex id[%d] (level_vertex_id[%d]) for patrol point[%s] in path[%s] in position[%f][%f][%f]",
@@ -139,7 +140,7 @@ const GameGraph::_GRAPH_ID &CPatrolPoint::game_vertex_id	() const
 		)
 	);
 
-	if (vertex->level_id() == ai().level_graph().level_id())
+	if (vertex && vertex->level_id() == ai().level_graph().level_id())
 		return			(game_vertex_id(&ai().level_graph(),&ai().cross_table(),&ai().game_graph()));
 
 	return				(m_game_vertex_id);

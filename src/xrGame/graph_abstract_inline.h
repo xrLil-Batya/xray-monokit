@@ -106,19 +106,33 @@ IC	void CAbstractGraph::clear				()
 TEMPLATE_SPECIALIZATION
 IC	const typename CAbstractGraph::CVertex *CAbstractGraph::vertex	(const _vertex_id_type &vertex_id) const
 {
-	const_vertex_iterator		I = vertices().find(vertex_id);
-	if (vertices().end() == I)
-		return					(0);
-	return						((*I).second);
+	try
+	{
+		const_vertex_iterator I = vertices().find(vertex_id);
+		if (vertices().end() == I)
+			return 0;
+		return (*I).second;
+	}
+	catch(...)
+	{
+		return 0;
+	}
 }
 
 TEMPLATE_SPECIALIZATION
 IC	typename CAbstractGraph::CVertex *CAbstractGraph::vertex		(const _vertex_id_type &vertex_id)
 {
-	vertex_iterator				I = m_vertices.find(vertex_id);
-	if (m_vertices.end() ==	I)
-		return					(0);
-	return						((*I).second);
+	try
+	{
+		vertex_iterator I = m_vertices.find(vertex_id);
+		if (m_vertices.end() ==	I)
+			return 0;
+		return (*I).second;
+	}
+	catch(...)
+	{
+		return 0;
+	}
 }
 
 TEMPLATE_SPECIALIZATION

@@ -561,7 +561,8 @@ void	game_sv_GameState::assign_RP				(CSE_Abstract* E, game_PlayerState* ps_who)
 			xrp.push_back(i);
 	}
 	u32 rpoint = 0;
-	if (xrp.size() && !tpSpectator)
+	R_ASSERT2(xrp.size(), "Can't find rpoints...");
+	if (!tpSpectator)
 	{
 		rpoint = xrp[::Random.randI((int)xrp.size())];
 	}

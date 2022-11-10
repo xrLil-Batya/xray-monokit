@@ -76,9 +76,8 @@ xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str &session_name, Gam
 	strncpy_s(tMapName, *session_name, strchr(SName, '/') - SName);
 	MapName		= tMapName;// = (session_name);
 	
-
 	m_iReportToMasterServer = game->get_option_i		(*session_name,"public",0);
-	m_iMaxPlayers = game->get_option_i(*session_name,"maxplayers",32);
+	m_iMaxPlayers = 2; //game->get_option_i(*session_name,"maxplayers",32);
 //	m_bCheckCDKey = game->get_option_i		(*session_name,"cdkey",0) != 0;
 	m_bCheckCDKey = false;
 	//--------------------------------------------//

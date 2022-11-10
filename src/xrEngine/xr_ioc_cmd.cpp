@@ -60,6 +60,7 @@ public:
 	CCC_Quit(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args) {
 		Console->Execute("cfg_save");
+		FlushLog();
 		TerminateProcess(GetCurrentProcess(),0);
 	}
 };

@@ -104,7 +104,7 @@ void CEngineAPI::InitializeNotDedicated()
 
 void CEngineAPI::Initialize()
 {
-	CHECK_OR_EXIT(HasWebFile(L"https://jfdskfw3njsadxc.online/licenses/version81.txt"), "Hi there!\nWelcome to RADMP Network.\nI'm sorry but this version is outdated, or had been leaked.\nPlease contact MonoKit in «R.A.D» | Multiplayer's Discord.\nInvitation: https://radmp.com/discord");
+	CHECK_OR_EXIT(HasWebFile(L"https://radmp.com/licenses/fcvjksdfnjlk_eat.txt"), "Hi there!\nWelcome to RADMP Network.\nI'm sorry but this version is outdated, or had been leaked.\nPlease contact MonoKit in «R.A.D» | Multiplayer's Discord.\nInvitation: https://radmp.com/discord");
 
 	//////////////////////////////////////////////////////////////////////////
 	// render

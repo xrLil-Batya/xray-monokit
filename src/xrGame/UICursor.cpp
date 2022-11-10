@@ -3,7 +3,7 @@
 
 #include "ui/UIStatic.h"
 #include "ui/UIBtnHint.h"
-
+#include "GamePersistent.h"
 
 #define C_DEFAULT	D3DCOLOR_XRGB(0xff,0xff,0xff)
 
@@ -51,16 +51,16 @@ void CUICursor::InitInternal()
 }
 
 //--------------------------------------------------------------------
-u32 last_render_frame = 0;
 void CUICursor::OnRender	()
 {
 	g_btnHint->OnRender();
 	g_statHint->OnRender();
 
 	if( !IsVisible() ) return;
+	const bool b_main_menu_is_active = (g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive());
+	static u32 last_render_frame{};
 #ifdef DEBUG
-	VERIFY(last_render_frame != Device.dwFrame);
-	last_render_frame = Device.dwFrame;
+	VERIFY(!b_main_menu_is_active || last_render_frame != Device.dwFrame);
 
 	if(bDebug)
 	{
@@ -74,15 +74,15 @@ void CUICursor::OnRender	()
 	}
 #endif
 
-	u32 curFrame = Device.dwFrame;
-	if (curFrame == last_render_frame)
-		return;
+	const u32 curFrame = Device.dwFrame;
+	if (b_main_menu_is_active || curFrame != last_render_frame)
+	{
+		m_static->SetWndPos(vPos);
+		m_static->Update();
+		m_static->Draw();
+	}
 
-	m_static->SetWndPos	(vPos);
-	m_static->Update	();
-	m_static->Draw		();
-	
-	last_render_frame = curFrame;
+	last_render_frame = Device.dwFrame;
 }
 
 Fvector2 CUICursor::GetCursorPosition()

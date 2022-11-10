@@ -1479,7 +1479,7 @@ HRESULT	CRender::shader_compile			(
 		xr_strcat		( file_name, temp_file_name );
 	}
 
-	if (FS.exist(file_name))
+	if (false && FS.exist(file_name)) //->xrLil Batya: отключил кэш шейдеров
 	{
 		IReader* file = FS.r_open(file_name);
 		if (file->length()>4)
@@ -1517,16 +1517,18 @@ HRESULT	CRender::shader_compile			(
 
 		if (SUCCEEDED(_result))
 		{
-			IWriter* file = FS.w_open(file_name);
+			if(false)
+			{
+				IWriter* file = FS.w_open(file_name);
 
-			boost::crc_32_type		processor;
-			processor.process_block	( pShaderBuf->GetBufferPointer(), ((char*)pShaderBuf->GetBufferPointer()) + pShaderBuf->GetBufferSize() );
-			u32 const crc			= processor.checksum( );
+				boost::crc_32_type		processor;
+				processor.process_block	( pShaderBuf->GetBufferPointer(), ((char*)pShaderBuf->GetBufferPointer()) + pShaderBuf->GetBufferSize() );
+				u32 const crc			= processor.checksum( );
 
-			file->w_u32				(crc);
-			file->w					(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
-			FS.w_close				(file);
-
+				file->w_u32				(crc);
+				file->w					(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
+				FS.w_close				(file);
+			}
 			_result					= create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize(), file_name, result, o.disasm);
 		}
 		else {
