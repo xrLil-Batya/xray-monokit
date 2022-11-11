@@ -18,6 +18,7 @@ public:
 									game_sv_freemp();
 	virtual							~game_sv_freemp();
 	
+	virtual		void				SetGameTimeFactor		(ALife::_TIME_ID GameTime, const float fTimeFactor);;// override;
 	virtual		void				Create(shared_str &options);
 
 

@@ -88,8 +88,10 @@ public:
 	virtual void			ColorAnimationSetTextureColor	(u32 color, bool only_alpha);
 	virtual void			ColorAnimationSetTextColor		(u32 color, bool only_alpha);
 
+	shared_str TextureName() const { return m_texName; }
 
 protected:
+	shared_str m_texName;
 	CUILines*		m_pTextControl;
 
 	bool			m_bStretchTexture;
@@ -135,6 +137,7 @@ public:
 			void		SetEllipsis				(bool mode)					{TextItemControl().SetEllipsis(mode);}
 			void		SetCutWordsMode			(bool mode)					{TextItemControl().SetCutWordsMode(mode);}
 			void		SetTextOffset			(float x, float y)			{TextItemControl().m_TextOffset.x = x; TextItemControl().m_TextOffset.y = y;}
+
 
 	virtual void		ColorAnimationSetTextColor(u32 color, bool only_alpha);
 

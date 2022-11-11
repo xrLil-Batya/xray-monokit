@@ -203,7 +203,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>./;../xrServerEntities;../../sdk/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\xrEngine\imgui;./;../xrServerEntities;../../sdk/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XRGAME_EXPORTS;dSINGLE;MSVC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
@@ -905,6 +905,10 @@
     <ClInclude Include="cover_point_inline.h" />
     <ClInclude Include="cta_game_artefact.h" />
     <ClInclude Include="cta_game_artefact_activation.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_helper.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_main.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_ui.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_weather.h" />
     <ClInclude Include="game_cl_roleplay.h" />
     <ClInclude Include="game_sv_roleplay.h" />
     <ClInclude Include="net_physics_state.h" />
@@ -3061,6 +3065,10 @@
     </ClCompile>
     <ClCompile Include="cta_game_artefact.cpp" />
     <ClCompile Include="cta_game_artefact_activation.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_helper.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_main.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_ui.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_weather.cpp" />
     <ClCompile Include="game_cl_roleplay.cpp" />
     <ClCompile Include="game_sv_freemp_save_players.cpp" />
     <ClCompile Include="game_sv_freemp_trade.cpp" />
@@ -5651,6 +5659,9 @@
     </ProjectReference>
     <ProjectReference Include="..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrEngine\imgui\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
     <ProjectReference Include="..\xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>

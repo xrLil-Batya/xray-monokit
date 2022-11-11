@@ -14,6 +14,10 @@
 #include "StateManager\dx10SamplerStateCache.h"
 #include "StateManager\dx10StateCache.h"
 
+#include <imgui.h>
+#include "backends\imgui_impl_dx11.h"
+#include "backends\imgui_impl_win32.h"
+
 #ifndef _EDITOR
 void	fill_vid_mode_list			(CHW* _hw);
 void	free_vid_mode_list			();
@@ -417,14 +421,32 @@ void CHW::CreateDevice( HWND m_hWnd, bool move_window )
 	size_t	memory									= Desc.DedicatedVideoMemory;
 	Msg		("*     Texture memory: %d M",		memory/(1024*1024));
 	//Msg		("*          DDI-level: %2.1f",		float(D3DXGetDriverLevel(pDevice))/100.f);
-#ifndef _EDITOR
 	updateWindowProps							(m_hWnd);
 	fill_vid_mode_list							(this);
-#endif
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplWin32_Init(m_hWnd);
+    ImGui_ImplDX11_Init(pDevice, pContext);
 }
 
 void CHW::DestroyDevice()
 {
+    // Cleanup
+    ImGui_ImplWin32_Shutdown();
+    ImGui_ImplDX11_Shutdown();
+    ImGui::DestroyContext();
+
 	//	Destroy state managers
 	StateManager.Reset();
 	RSManager.ClearStateArray();

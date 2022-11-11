@@ -3,6 +3,7 @@
 #include "Level.h"
 #include "alife_simulator.h"
 #include "alife_spawn_registry.h"
+#include "alife_time_manager.h"
 
 game_sv_freemp::game_sv_freemp()
 	:pure_relcase(&game_sv_freemp::net_Relcase)
@@ -390,4 +391,12 @@ void game_sv_freemp::on_death(CSE_Abstract* e_dest, CSE_Abstract* e_src)
 		return;
 
 	alife().on_death(e_dest, e_src);
+}
+
+void game_sv_freemp::SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor)
+{
+	if (ai().get_alife() && ai().alife().initialized())
+		return(alife().time_manager().set_game_time_factor(GameTime, fTimeFactor));
+	else
+		return(inherited::SetGameTimeFactor(fTimeFactor));
 }

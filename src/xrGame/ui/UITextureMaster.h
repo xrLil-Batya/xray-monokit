@@ -45,6 +45,7 @@ public:
 	static Frect	GetTextureRect		(const shared_str&  texture_name);
 	static void		GetTextureShader	(const shared_str&  texture_name, ui_shader& sh);
 	static TEX_INFO	FindItem			(const shared_str&  texture_name);
+	static const xr_vector<xr_string>& GetTextureList();
 protected:
 	IC	static bool IsSh				(const shared_str& texture_name);
 

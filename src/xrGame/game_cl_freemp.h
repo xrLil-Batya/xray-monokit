@@ -20,6 +20,7 @@ public:
 	virtual CUIGameCustom* createGameUI();
 	virtual void SetGameUI(CUIGameCustom*);
 
+	virtual void SetEnvironmentGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor) override;
 
 	virtual	void net_import_state(NET_Packet& P);
 	virtual	void net_import_update(NET_Packet& P);

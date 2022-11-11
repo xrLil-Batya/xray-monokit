@@ -6,6 +6,7 @@
 #include "actor_mp_client.h"
 #include "VoiceChat.h"
 #include "ui/UIMainIngameWnd.h"
+#include "alife_simulator.h"
 
 game_cl_freemp::game_cl_freemp()
 {
@@ -223,4 +224,12 @@ void game_cl_freemp::OnScreenResolutionChanged()
 void game_cl_freemp::OnVoiceMessage(NET_Packet* P)
 {
 	m_pVoiceChat->ReceiveMessage(P);
+}
+
+void game_cl_freemp::SetEnvironmentGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor)
+{
+	if (ai().get_alife() && ai().alife().initialized())
+		Level().Server->game->SetGameTimeFactor(GameTime, fTimeFactor);
+	else
+		inherited::SetEnvironmentGameTimeFactor(fTimeFactor);
 }

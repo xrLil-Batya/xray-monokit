@@ -23,6 +23,7 @@ public:
 	virtual bool	GetStretchTexture			()				{return false;};	
 
 	virtual void	Draw						();
+	shared_str TextureName() const { return m_TextureName; }
 	
 protected:
 	bool			m_bTextureVisible;
@@ -39,4 +40,5 @@ protected:
 	bool				get_points			(Frect const& r, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);
 	void				draw_tile_line		(Frect rect, int i, bool b_horz, Fvector2 const& ts);
 	void				draw_tile_rect		(Frect rect, int i, Fvector2 const& ts);
+	shared_str m_TextureName;
 };

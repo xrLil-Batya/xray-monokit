@@ -2515,6 +2515,9 @@
     <Filter Include="UI\GameTypes\FreeMp\RP_ANIMATION_MODE">
       <UniqueIdentifier>{8c450480-22ac-4eef-a70a-4b8bf5264677}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\ImGUI">
+      <UniqueIdentifier>{41b53eb8-86ee-479e-a0c9-402adaf7536e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -7434,8 +7437,24 @@
     <ClInclude Include="UI_AnimMode.h">
       <Filter>UI\GameTypes\FreeMp\RP_ANIMATION_MODE</Filter>
     </ClInclude>
-    <ClInclude Include="VoiceChat.h" />
-    <ClInclude Include="VoiceSender.h" />
+    <ClInclude Include="VoiceChat.h">
+      <Filter>Core\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceSender.h">
+      <Filter>Core\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="embedded_editor\embedded_editor_helper.h">
+      <Filter>UI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="embedded_editor\embedded_editor_main.h">
+      <Filter>UI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="embedded_editor\embedded_editor_weather.h">
+      <Filter>UI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="embedded_editor\embedded_editor_ui.h">
+      <Filter>UI\ImGUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -11128,8 +11147,24 @@
     <ClCompile Include="ActorAnimation_Scripts.cpp">
       <Filter>Core\Client\Objects\actor\base</Filter>
     </ClCompile>
-    <ClCompile Include="VoiceChat.cpp" />
-    <ClCompile Include="VoiceSender.cpp" />
+    <ClCompile Include="VoiceChat.cpp">
+      <Filter>Core\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceSender.cpp">
+      <Filter>Core\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="embedded_editor\embedded_editor_helper.cpp">
+      <Filter>UI\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="embedded_editor\embedded_editor_main.cpp">
+      <Filter>UI\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="embedded_editor\embedded_editor_weather.cpp">
+      <Filter>UI\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="embedded_editor\embedded_editor_ui.cpp">
+      <Filter>UI\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
